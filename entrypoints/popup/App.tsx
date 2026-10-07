@@ -1,5 +1,6 @@
 import { Fragment } from 'react';
 import { FileJson, Link2, Settings } from 'lucide-react';
+import icon from '@/assets/icon.svg';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
@@ -56,6 +57,7 @@ function App() {
   return (
     <div className="flex w-[360px] flex-col">
       <header className="flex items-center gap-2 border-b px-4 py-3">
+        <img src={icon} alt="" className="size-5" />
         <h1 className="font-heading text-base font-semibold">Headering</h1>
         {activeCount > 0 && <Badge>{activeCount} active</Badge>}
         <Tooltip>

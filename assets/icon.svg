@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Headering</title>
+  <rect width="128" height="128" rx="28" fill="#4F46E5"/>
+  <!-- Request header: band pointing out -->
+  <path d="M40 22h62l18 12-18 12H26V36a14 14 0 0 1 14-14z" fill="#FBBF24"/>
+  <rect x="26" y="46" width="76" height="36" fill="#fff"/>
+  <rect x="38" y="58" width="52" height="9" rx="4.5" fill="#C7D2FE"/>
+  <!-- Response header: band pointing back -->
+  <path d="M26 82h76v10a14 14 0 0 1-14 14H26L8 94z" fill="#C7D2FE"/>
+</svg>
