@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "type": "number",
+      "const": 1
+    },
+    "profiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "enabled": {
+            "default": true,
+            "type": "boolean"
+          },
+          "group": {
+            "description": "Profiles sharing a group are mutually exclusive: enabling one disables the others.",
+            "type": "string",
+            "minLength": 1
+          },
+          "domains": {
+            "description": "Hosts (and their subdomains) to apply to. Omit to apply to all sites.",
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9-]+(\\.[a-z0-9-]+)*$"
+            }
+          },
+          "requestHeaders": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "pattern": "^[!#$%&'*+.^_`|~0-9A-Za-z-]+$"
+                },
+                "operation": {
+                  "default": "set",
+                  "type": "string",
+                  "enum": [
+                    "set",
+                    "remove"
+                  ]
+                },
+                "value": {
+                  "type": "string"
+                },
+                "options": {
+                  "description": "Label → value presets, shown as a dropdown in the popup. \"value\" defaults to the first one.",
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "responseHeaders": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "pattern": "^[!#$%&'*+.^_`|~0-9A-Za-z-]+$"
+                },
+                "operation": {
+                  "default": "set",
+                  "type": "string",
+                  "enum": [
+                    "set",
+                    "remove"
+                  ]
+                },
+                "value": {
+                  "type": "string"
+                },
+                "options": {
+                  "description": "Label → value presets, shown as a dropdown in the popup. \"value\" defaults to the first one.",
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "version",
+    "profiles"
+  ],
+  "additionalProperties": false
+}

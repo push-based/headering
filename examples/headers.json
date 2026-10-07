@@ -1,0 +1,88 @@
+{
+  "$schema": "../config.schema.json",
+  "version": 1,
+  "profiles": [
+    {
+      "name": "SSR Skip Cache",
+      "enabled": false,
+      "requestHeaders": [
+        {
+          "name": "x-ssr-skip-cache",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "name": "SSR Enabled",
+      "enabled": false,
+      "group": "SSR mode",
+      "requestHeaders": [
+        {
+          "name": "x-ssr-enabled",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "name": "SSR Disabled",
+      "enabled": false,
+      "group": "SSR mode",
+      "requestHeaders": [
+        {
+          "name": "x-ssr-disabled",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "name": "Forwarded For",
+      "enabled": false,
+      "requestHeaders": [
+        {
+          "name": "x-forwarded-for",
+          "options": {
+            "BR": "1.178.47.255",
+            "BE": "81.246.0.10",
+            "GB": "2.127.255.255",
+            "DE": "101.46.227.25",
+            "AT": "104.103.80.32",
+            "ES": "103.202.235.25",
+            "MX": "200.68.128.83",
+            "GR": "212.54.197.34",
+            "CA": "128.100.100.1",
+            "IT": "212.216.112.112",
+            "ZA": "137.158.128.1",
+            "CO": "168.176.5.1",
+            "PT": "194.117.3.41",
+            "FR": "193.55.96.23",
+            "US-AZ": "134.114.138.34",
+            "US-CO": "128.138.68.45",
+            "US-DC": "147.9.1.9",
+            "US-IA": "134.161.7.207",
+            "US-IL": "128.248.155.93",
+            "US-IN": "128.210.7.200",
+            "US-KS": "129.237.135.76",
+            "US-KY": "128.163.35.46",
+            "US-LA": "130.39.6.220",
+            "US-MA": "128.119.10.27",
+            "US-MD": "130.85.30.98",
+            "US-MI": "141.217.1.160",
+            "US-MO": "131.151.244.229",
+            "US-MS": "130.74.120.3",
+            "US-NC": "152.3.72.243",
+            "US-NJ": "128.6.82.14",
+            "US-NV": "167.154.222.154",
+            "US-NY": "129.21.1.40",
+            "US-OH": "134.53.247.33",
+            "US-PA": "128.2.42.52",
+            "US-PR": "136.145.11.224",
+            "US-TN": "149.149.46.35",
+            "US-VA": "134.126.126.99",
+            "US-WV": "216.30.209.88",
+            "US-WY": "129.72.61.21"
+          }
+        }
+      ]
+    }
+  ]
+}

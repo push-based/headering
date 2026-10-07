@@ -1,0 +1,20 @@
+{
+  "$schema": "../config.schema.json",
+  "version": 1,
+  "profiles": [
+    {
+      "name": "Staging API",
+      "domains": ["api.staging.example.com"],
+      "requestHeaders": [
+        { "name": "X-Debug", "value": "1" },
+        { "name": "X-Feature-Flags", "value": "new-checkout" }
+      ]
+    },
+    {
+      "name": "Allow framing",
+      "enabled": false,
+      "domains": ["localhost"],
+      "responseHeaders": [{ "name": "X-Frame-Options", "operation": "remove" }]
+    }
+  ]
+}

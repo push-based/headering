@@ -1,0 +1,11 @@
+{
+  "extends": "./.wxt/tsconfig.json",
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "jsx": "react-jsx",
+    // Mirrors WXT's alias here so tools that don't follow `extends` (e.g. the shadcn CLI) resolve it.
+    "paths": {
+      "@/*": ["./*"]
+    }
+  }
+}
