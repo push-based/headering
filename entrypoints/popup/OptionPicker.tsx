@@ -83,19 +83,21 @@ export function OptionPicker({ header, onChange }: { header: Header; onChange: (
             />
             <CommandList className="max-h-56">
               <CommandEmpty>No matches.</CommandEmpty>
-              <CommandGroup>
+              {/* Grid with subgrid rows so the label column fits the longest label and values stay aligned. */}
+              <CommandGroup className="**:[[cmdk-group-items]]:grid **:[[cmdk-group-items]]:grid-cols-[auto_1fr_auto]">
                 {header.options?.map((option) => (
                   <CommandItem
                     key={option.label}
                     value={option.label}
                     keywords={[option.value]}
                     data-checked={option.value === header.value}
+                    className="col-span-3 grid grid-cols-subgrid"
                     onSelect={() => {
                       onChange(option.value);
                       setOpenState(false);
                     }}
                   >
-                    <span className="w-12 font-medium">{option.label}</span>
+                    <span className="font-medium whitespace-nowrap">{option.label}</span>
                     <span className="font-mono text-xs text-muted-foreground">{option.value}</span>
                   </CommandItem>
                 ))}
