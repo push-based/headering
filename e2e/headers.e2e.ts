@@ -67,6 +67,34 @@ test('grouped profiles are mutually exclusive', async ({ context, extensionUrl, 
   expect(await receivedHeaders(site, echoUrl)).not.toHaveProperty('x-ssr-enabled');
 });
 
+test('pausing stops every profile until resumed', async ({ context, extensionUrl, echoUrl }) => {
+  const popup = await setUp(context, extensionUrl);
+  const skipCache = popup.getByRole('switch', { name: 'SSR Skip Cache' });
+  await skipCache.click();
+
+  const site = await context.newPage();
+  await expect.poll(() => receivedHeaders(site, echoUrl)).toMatchObject({ 'x-ssr-skip-cache': '1' });
+
+  const worker = context.serviceWorkers()[0]!;
+  const badgeText = () => worker.evaluate(() => chrome.action.getBadgeText({}));
+
+  await popup.bringToFront();
+  const pause = popup.getByRole('button', { name: 'Pause all profiles' });
+  await pause.click();
+  await expect(pause).toHaveAttribute('aria-pressed', 'true');
+  await expect(popup.getByRole('banner')).toContainText('Paused');
+  // Profiles keep their state so resuming brings them back.
+  await expect(skipCache).toBeChecked();
+  await expect.poll(async () => (await receivedHeaders(site, echoUrl))['x-ssr-skip-cache']).toBeUndefined();
+  await expect.poll(badgeText).toBe('off');
+
+  await pause.click();
+  await expect(pause).toHaveAttribute('aria-pressed', 'false');
+  await expect(popup.getByRole('banner')).not.toContainText('Paused');
+  await expect.poll(() => receivedHeaders(site, echoUrl)).toMatchObject({ 'x-ssr-skip-cache': '1' });
+  await expect.poll(badgeText).toBe('1');
+});
+
 test('the option picker is keyboard driven', async ({ context, extensionUrl }) => {
   const popup = await setUp(context, extensionUrl);
   const picker = popup.getByRole('combobox', { name: 'x-forwarded-for' });

@@ -1,16 +1,21 @@
-import type { Config } from '@/lib/config';
 import { documentRequestItem, type DocumentRequest } from '@/lib/document';
 import { buildRules } from '@/lib/rules';
-import { configItem } from '@/lib/settings';
+import { configItem, pausedItem } from '@/lib/settings';
 
-async function applyConfig(config: Config) {
+const BADGE_COLOR = '#4F46E5';
+const PAUSED_BADGE_COLOR = '#737373';
+
+async function applyConfig() {
+  const [config, paused] = await Promise.all([configItem.getValue(), pausedItem.getValue()]);
   const existing = await browser.declarativeNetRequest.getDynamicRules();
-  const addRules = buildRules(config);
+  // Pausing drops every rule but leaves the profiles' enabled state alone, so resuming restores them.
+  const addRules = paused ? [] : buildRules(config);
   await browser.declarativeNetRequest.updateDynamicRules({
     removeRuleIds: existing.map((rule) => rule.id),
     addRules,
   });
-  await browser.action.setBadgeText({ text: addRules.length ? String(addRules.length) : '' });
+  await browser.action.setBadgeBackgroundColor({ color: paused ? PAUSED_BADGE_COLOR : BADGE_COLOR });
+  await browser.action.setBadgeText({ text: paused ? 'off' : addRules.length ? String(addRules.length) : '' });
 }
 
 /** Remembers each tab's latest document request so the popup can show its headers. */
@@ -53,18 +58,18 @@ function trackDocumentRequests() {
 }
 
 export default defineBackground(() => {
-  // Chain updates so a quick sequence of changes can't interleave.
+  // Chain updates so a quick sequence of changes can't interleave. Each run reads
+  // the latest config and paused state, so it doesn't matter which one changed.
   let queue = Promise.resolve();
-  const sync = (config: Config) => {
-    queue = queue
-      .then(() => applyConfig(config))
-      .catch((err) => console.error('Failed to apply header rules', err));
+  const sync = () => {
+    queue = queue.then(applyConfig).catch((err) => console.error('Failed to apply header rules', err));
   };
 
   configItem.watch(sync);
+  pausedItem.watch(sync);
 
   // Dynamic rules persist across restarts; resync after install/update.
-  browser.runtime.onInstalled.addListener(async () => sync(await configItem.getValue()));
+  browser.runtime.onInstalled.addListener(sync);
 
   trackDocumentRequests();
 });

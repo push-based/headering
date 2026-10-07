@@ -35,17 +35,17 @@ Everything is driven by a JSON config that can be shared as a file. Import it fr
 | `*Headers[].options` | – | `{ "label": "value" }` presets shown as a dropdown in the popup; `value` defaults to the first |
 | `inspect.requestHeaders` / `inspect.responseHeaders` | – | Header names to show in the popup for the current page's document request (the final one, after redirects). Request headers include the ones added here |
 
-The popup can only show requests made after the extension loaded, so reload pages that were already open. Earlier profiles win when two profiles set the same header. Unknown keys are rejected so typos surface on import. `config.schema.json` (generated with `pnpm schema`) gives editors validation and autocomplete; see `examples/`.
+The popup's pause button turns every profile off at once without touching their switches, so resuming restores them; the toolbar badge reads `off` while paused. The paused state isn't part of the config, so it isn't exported. The popup can only show requests made after the extension loaded, so reload pages that were already open. Earlier profiles win when two profiles set the same header. Unknown keys are rejected so typos surface on import. `config.schema.json` (generated with `pnpm schema`) gives editors validation and autocomplete; see `examples/`.
 
 ## Layout
 
 - `entrypoints/background.ts` – service worker; syncs the stored config into DNR rules and records each tab's document request headers
-- `entrypoints/popup/` – profile on/off toggles and the inspected headers of the current page
+- `entrypoints/popup/` – profile on/off toggles, pause all, and the inspected headers of the current page
 - `entrypoints/options/` – import / edit / preview / export the JSON config
 - `lib/config.ts` – Zod schema, parsing and serialization (source of truth for the format)
 - `lib/rules.ts` – pure `config → DNR rules` mapping
 - `lib/document.ts` – captured document requests (`chrome.storage.session`, per tab) and header lookup
-- `lib/settings.ts` – typed `chrome.storage` item
+- `lib/settings.ts` – typed `chrome.storage` items (config and paused state)
 - `components/ui/` – shadcn/ui components (add more with `pnpm dlx shadcn@latest add <name>`)
 - `assets/tailwind.css` – Tailwind + shadcn theme; dark mode follows the OS
 - `e2e/` – Playwright tests against the built extension
