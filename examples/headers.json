@@ -1,6 +1,9 @@
 {
   "$schema": "../config.schema.json",
   "version": 1,
+  "inspect": {
+    "responseHeaders": ["x-ssr-request-id", "x-ssr-status", "x-ssr-status-code"]
+  },
   "profiles": [
     {
       "name": "SSR Skip Cache",

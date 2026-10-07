@@ -9,6 +9,29 @@
       "type": "number",
       "const": 1
     },
+    "inspect": {
+      "type": "object",
+      "properties": {
+        "requestHeaders": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[!#$%&'*+.^_`|~0-9A-Za-z-]+$"
+          }
+        },
+        "responseHeaders": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[!#$%&'*+.^_`|~0-9A-Za-z-]+$"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "description": "Headers of the current page's document request to show in the popup."
+    },
     "profiles": {
       "type": "array",
       "items": {

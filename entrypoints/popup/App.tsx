@@ -11,6 +11,7 @@ import type { Config, Profile } from '@/lib/config';
 import { groupProfiles, setProfileEnabled } from '@/lib/profiles';
 import { configItem } from '@/lib/settings';
 import { cn } from '@/lib/utils';
+import { DocumentHeaders } from './DocumentHeaders';
 import { OptionPicker } from './OptionPicker';
 
 const HEADER_LISTS = ['requestHeaders', 'responseHeaders'] as const;
@@ -69,6 +70,8 @@ function App() {
           <TooltipContent>Manage configuration</TooltipContent>
         </Tooltip>
       </header>
+
+      {config.inspect && <DocumentHeaders inspect={config.inspect} />}
 
       {config.profiles.length ? (
         <ItemGroup className="gap-2 p-3">

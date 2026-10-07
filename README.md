@@ -1,8 +1,8 @@
 # Headering
 
-A Chrome extension for modifying HTTP request headers, built with [WXT](https://wxt.dev), React, TypeScript, Tailwind CSS and [shadcn/ui](https://ui.shadcn.com).
+A Chrome extension for modifying HTTP headers and inspecting the headers of the current page, built with [WXT](https://wxt.dev), React, TypeScript, Tailwind CSS and [shadcn/ui](https://ui.shadcn.com).
 
-Headers are applied with [`chrome.declarativeNetRequest`](https://developer.chrome.com/docs/extensions/reference/api/declarativeNetRequest) dynamic rules.
+Headers are applied with [`chrome.declarativeNetRequest`](https://developer.chrome.com/docs/extensions/reference/api/declarativeNetRequest) dynamic rules. Each tab's document request is observed with [`chrome.webRequest`](https://developer.chrome.com/docs/extensions/reference/api/webRequest) so the popup can show its headers.
 
 ## Configuration
 
@@ -12,6 +12,9 @@ Everything is driven by a JSON config that can be shared as a file. Import it fr
 {
   "$schema": "../config.schema.json",
   "version": 1,
+  "inspect": {
+    "responseHeaders": ["x-ssr-request-id", "x-ssr-status"]
+  },
   "profiles": [
     {
       "name": "Staging API",
@@ -30,16 +33,18 @@ Everything is driven by a JSON config that can be shared as a file. Import it fr
 | `profiles[].domains` | all sites | Hostnames; subdomains match too |
 | `*Headers[].operation` | `"set"` | `"set"` needs a `value` or `options`, `"remove"` must have neither |
 | `*Headers[].options` | – | `{ "label": "value" }` presets shown as a dropdown in the popup; `value` defaults to the first |
+| `inspect.requestHeaders` / `inspect.responseHeaders` | – | Header names to show in the popup for the current page's document request (the final one, after redirects). Request headers include the ones added here |
 
-Earlier profiles win when two profiles set the same header. Unknown keys are rejected so typos surface on import. `config.schema.json` (generated with `pnpm schema`) gives editors validation and autocomplete; see `examples/`.
+The popup can only show requests made after the extension loaded, so reload pages that were already open. Earlier profiles win when two profiles set the same header. Unknown keys are rejected so typos surface on import. `config.schema.json` (generated with `pnpm schema`) gives editors validation and autocomplete; see `examples/`.
 
 ## Layout
 
-- `entrypoints/background.ts` – service worker; syncs the stored config into DNR rules
-- `entrypoints/popup/` – profile on/off toggles
+- `entrypoints/background.ts` – service worker; syncs the stored config into DNR rules and records each tab's document request headers
+- `entrypoints/popup/` – profile on/off toggles and the inspected headers of the current page
 - `entrypoints/options/` – import / edit / preview / export the JSON config
 - `lib/config.ts` – Zod schema, parsing and serialization (source of truth for the format)
 - `lib/rules.ts` – pure `config → DNR rules` mapping
+- `lib/document.ts` – captured document requests (`chrome.storage.session`, per tab) and header lookup
 - `lib/settings.ts` – typed `chrome.storage` item
 - `components/ui/` – shadcn/ui components (add more with `pnpm dlx shadcn@latest add <name>`)
 - `assets/tailwind.css` – Tailwind + shadcn theme; dark mode follows the OS

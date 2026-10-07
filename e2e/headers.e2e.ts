@@ -2,6 +2,9 @@ import { readFileSync } from 'node:fs';
 import type { BrowserContext, Page } from '@playwright/test';
 import { expect, test } from './fixtures';
 
+// Available inside the extension's service worker, where worker.evaluate() runs.
+declare const chrome: typeof import('wxt/browser').browser;
+
 const exampleConfig = readFileSync(new URL('../examples/headers.json', import.meta.url), 'utf8');
 
 const receivedHeaders = async (page: Page, url: string) => {
@@ -9,11 +12,11 @@ const receivedHeaders = async (page: Page, url: string) => {
   return JSON.parse((await page.locator('body').textContent()) ?? '{}') as Record<string, string>;
 };
 
-/** Imports the example config via the options page and returns an open popup. */
-async function setUp(context: BrowserContext, extensionUrl: (page: string) => string) {
+/** Imports a config (the example by default) via the options page and returns an open popup. */
+async function setUp(context: BrowserContext, extensionUrl: (page: string) => string, config = exampleConfig) {
   const options = await context.newPage();
   await options.goto(extensionUrl('options.html'));
-  await options.getByLabel('Configuration JSON').fill(exampleConfig);
+  await options.getByLabel('Configuration JSON').fill(config);
   await options.getByRole('button', { name: 'Apply' }).click();
   await expect(options.getByRole('status')).toHaveText('Configuration applied.');
 
@@ -91,4 +94,47 @@ test('the option picker is keyboard driven', async ({ context, extensionUrl }) =
   await popup.keyboard.press('ArrowDown');
   await expect(picker).toHaveAttribute('aria-expanded', 'true');
   await expect(popup.getByRole('option', { selected: true })).toContainText('US-NJ');
+});
+
+test('shows the configured headers of the page\'s document request', async ({ context, extensionUrl, echoUrl }) => {
+  const config = {
+    version: 1,
+    inspect: {
+      requestHeaders: ['x-ssr-skip-cache'],
+      responseHeaders: ['x-ssr-request-id', 'x-ssr-status', 'x-ssr-status-code'],
+    },
+    profiles: [{ name: 'SSR Skip Cache', requestHeaders: [{ name: 'x-ssr-skip-cache', value: '1' }] }],
+  };
+  await setUp(context, extensionUrl, JSON.stringify(config));
+
+  const site = await context.newPage();
+  await expect.poll(() => receivedHeaders(site, echoUrl)).toMatchObject({ 'x-ssr-skip-cache': '1' });
+
+  const worker = context.serviceWorkers()[0]!;
+  const tabId = await worker.evaluate(async (url) => (await chrome.tabs.query({ url }))[0]?.id, echoUrl);
+  const popup = await context.newPage();
+  await popup.goto(extensionUrl(`popup.html?tabId=${tabId}`));
+
+  const section = popup.getByRole('region', { name: 'Page headers' });
+  const value = (name: string) => section.getByRole('term').filter({ hasText: new RegExp(`^${name}$`) }).locator('+ dd');
+
+  await expect(section).toContainText(echoUrl);
+  await expect(section.getByLabel('Status code')).toHaveText('200');
+  // Request headers include the ones added by the extension's own rules.
+  await expect(value('x-ssr-skip-cache')).toHaveText('1');
+  await expect(value('x-ssr-status')).toHaveText('HIT');
+  await expect(value('x-ssr-status-code')).toHaveText('not set');
+
+  // Updates live when the page reloads.
+  const before = await value('x-ssr-request-id').textContent();
+  await site.reload();
+  await expect(value('x-ssr-request-id')).not.toHaveText(before ?? '');
+  await expect(value('x-ssr-request-id')).toHaveText(/^req-\d+$/);
+});
+
+test('asks for a reload when the page was loaded before the extension', async ({ context, extensionUrl }) => {
+  await setUp(context, extensionUrl);
+  const popup = await context.newPage();
+  await popup.goto(extensionUrl('popup.html?tabId=999999'));
+  await expect(popup.getByRole('region', { name: 'Page headers' })).toHaveText('Reload the page to see its headers.');
 });

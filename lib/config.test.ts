@@ -149,6 +149,33 @@ describe('parseConfig', () => {
     });
   });
 
+  describe('inspect', () => {
+    it('defaults missing lists and round-trips through serializeConfig', () => {
+      const result = parse({ version: 1, inspect: { responseHeaders: ['x-ssr-status'] }, profiles: [] });
+      if (!result.ok) throw new Error('expected valid config');
+
+      expect(result.config.inspect).toEqual({ requestHeaders: [], responseHeaders: ['x-ssr-status'] });
+      expect(JSON.parse(serializeConfig(result.config))).toEqual({
+        version: 1,
+        inspect: { responseHeaders: ['x-ssr-status'] },
+        profiles: [],
+      });
+    });
+
+    it('omits an empty inspect block when serializing', () => {
+      const result = parse({ version: 1, inspect: {}, profiles: [] });
+      if (!result.ok) throw new Error('expected valid config');
+      expect(JSON.parse(serializeConfig(result.config))).not.toHaveProperty('inspect');
+    });
+
+    it('rejects invalid header names', () => {
+      expect(parse({ version: 1, inspect: { responseHeaders: ['x ssr'] }, profiles: [] })).toEqual({
+        ok: false,
+        errors: ['inspect.responseHeaders.0: Invalid header name'],
+      });
+    });
+  });
+
   it('round-trips through serializeConfig', () => {
     const first = parse({ version: 1, profiles: [{ name: 'P', domains: ['example.com'] }] });
     if (!first.ok) throw new Error('expected valid config');

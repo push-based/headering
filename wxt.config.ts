@@ -12,9 +12,9 @@ export default defineConfig({
   }),
   manifest: {
     name: 'Headering',
-    description: 'Modify HTTP request headers.',
-    permissions: ['declarativeNetRequest', 'storage'],
-    // modifyHeaders rules only apply to URLs the extension has host access to.
+    description: 'Modify and inspect HTTP headers.',
+    permissions: ['declarativeNetRequest', 'storage', 'webRequest'],
+    // modifyHeaders rules and webRequest events only apply to URLs the extension has host access to.
     host_permissions: ['<all_urls>'],
   },
 });

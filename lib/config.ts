@@ -10,11 +10,12 @@ export interface HeaderOption {
   value: string;
 }
 
+const HeaderName = z.string().regex(HEADER_NAME, 'Invalid header name');
 const HeaderValue = z.string().refine((v) => !/[\r\n]/.test(v), 'Header value must not contain line breaks');
 
 const Header = z
   .strictObject({
-    name: z.string().regex(HEADER_NAME, 'Invalid header name'),
+    name: HeaderName,
     operation: z.enum(['set', 'remove']).default('set'),
     value: HeaderValue.optional(),
     options: z
@@ -58,10 +59,18 @@ const Profile = z.strictObject({
   responseHeaders: z.array(Header).default([]),
 });
 
+const Inspect = z
+  .strictObject({
+    requestHeaders: z.array(HeaderName).default([]),
+    responseHeaders: z.array(HeaderName).default([]),
+  })
+  .describe("Headers of the current page's document request to show in the popup.");
+
 export const Config = z
   .strictObject({
     $schema: z.string().optional(),
     version: z.literal(1),
+    inspect: Inspect.optional(),
     profiles: z.array(Profile),
   })
   .superRefine((config, ctx) => {
@@ -82,6 +91,7 @@ export const Config = z
 export type Config = z.output<typeof Config>;
 export type Profile = z.output<typeof Profile>;
 export type Header = z.output<typeof Header>;
+export type Inspect = z.output<typeof Inspect>;
 
 export const EMPTY_CONFIG: Config = { version: 1, profiles: [] };
 
@@ -112,9 +122,17 @@ export function parseConfig(text: string): ParseResult {
  * defaults omitted.
  */
 export function serializeConfig(config: Config): string {
+  const { inspect } = config;
   const json = {
     ...(config.$schema !== undefined && { $schema: config.$schema }),
     version: config.version,
+    ...(inspect &&
+      (inspect.requestHeaders.length > 0 || inspect.responseHeaders.length > 0) && {
+        inspect: {
+          ...(inspect.requestHeaders.length > 0 && { requestHeaders: inspect.requestHeaders }),
+          ...(inspect.responseHeaders.length > 0 && { responseHeaders: inspect.responseHeaders }),
+        },
+      }),
     profiles: config.profiles.map((profile) => ({
       name: profile.name,
       enabled: profile.enabled,

@@ -26,10 +26,13 @@ export const test = base.extend<{
     await use((page) => `chrome-extension://${id}/${page}`);
   },
 
-  // Responds with the request headers it received, as JSON.
+  // Responds with the request headers it received, as JSON, plus a couple of x-ssr-* response headers.
   echoUrl: async ({}, use) => {
+    let requests = 0;
     const server: Server = createServer((req, res) => {
       res.setHeader('content-type', 'application/json');
+      res.setHeader('x-ssr-request-id', `req-${++requests}`);
+      res.setHeader('x-ssr-status', 'HIT');
       res.end(JSON.stringify(req.headers));
     });
     await new Promise<void>((done) => server.listen(0, '127.0.0.1', done));

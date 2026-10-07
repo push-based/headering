@@ -1,5 +1,5 @@
 import type { ChangeEvent, DragEvent } from 'react';
-import { Check, CircleAlert, Copy, Download, Globe, Link2, TriangleAlert, Upload } from 'lucide-react';
+import { Check, CircleAlert, Copy, Download, Eye, Globe, Link2, TriangleAlert, Upload } from 'lucide-react';
 import icon from '@/assets/icon.svg';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -189,19 +189,39 @@ function App() {
 }
 
 function Preview({ config }: { config: Config }) {
-  if (!config.profiles.length) {
-    return (
-      <Empty>
-        <EmptyHeader>
-          <EmptyTitle>No profiles</EmptyTitle>
-          <EmptyDescription>Add a profile to the JSON to see it here.</EmptyDescription>
-        </EmptyHeader>
-      </Empty>
-    );
-  }
+  const inspected = [
+    ...(config.inspect?.requestHeaders.map((name) => ({ direction: 'request' as const, name })) ?? []),
+    ...(config.inspect?.responseHeaders.map((name) => ({ direction: 'response' as const, name })) ?? []),
+  ];
 
   return (
     <ItemGroup className="gap-2">
+      {inspected.length > 0 && (
+        <Item variant="outline">
+          <ItemContent>
+            <ItemTitle>
+              <Eye className="size-4" /> Shown in the popup
+            </ItemTitle>
+            <ItemDescription>Read from the current page's document request.</ItemDescription>
+          </ItemContent>
+          <ItemFooter className="flex-col items-stretch gap-1.5">
+            {inspected.map(({ direction, name }) => (
+              <div key={`${direction}-${name}`} className="flex min-w-0 items-center gap-2 text-xs">
+                <DirectionBadge direction={direction} />
+                <code className="truncate font-mono">{name}</code>
+              </div>
+            ))}
+          </ItemFooter>
+        </Item>
+      )}
+      {!config.profiles.length && (
+        <Empty>
+          <EmptyHeader>
+            <EmptyTitle>No profiles</EmptyTitle>
+            <EmptyDescription>Add a profile to the JSON to see it here.</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      )}
       {config.profiles.map((profile, index) => (
         <Item key={index} variant="outline" className={cn(!profile.enabled && 'opacity-60')}>
           <ItemContent>
@@ -245,9 +265,7 @@ function HeaderLine({ direction, header }: { direction: 'request' | 'response'; 
 
   return (
     <div className="flex min-w-0 items-center gap-2 text-xs">
-      <Badge variant="secondary" className="w-16 shrink-0 font-mono uppercase">
-        {direction === 'request' ? 'req' : 'res'}
-      </Badge>
+      <DirectionBadge direction={direction} />
       <code className="truncate font-mono">
         {header.operation === 'remove' ? (
           <>
@@ -265,6 +283,14 @@ function HeaderLine({ direction, header }: { direction: 'request' | 'response'; 
         </Badge>
       )}
     </div>
+  );
+}
+
+function DirectionBadge({ direction }: { direction: 'request' | 'response' }) {
+  return (
+    <Badge variant="secondary" className="w-16 shrink-0 font-mono uppercase">
+      {direction === 'request' ? 'req' : 'res'}
+    </Badge>
   );
 }
 
