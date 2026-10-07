@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { FileJson, Globe, Link2, Settings } from 'lucide-react';
+import { FileJson, Link2, Settings } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
@@ -143,15 +143,9 @@ function ProfileItem({
             {profile.name}
           </label>
         </ItemTitle>
-        <ItemDescription className="flex items-center gap-1 truncate text-xs">
-          {profile.domains ? (
-            profile.domains.join(', ')
-          ) : (
-            <>
-              <Globe className="size-3" /> All sites
-            </>
-          )}
-        </ItemDescription>
+        {profile.domains && (
+          <ItemDescription className="truncate text-xs">{profile.domains.join(', ')}</ItemDescription>
+        )}
       </ItemContent>
       <ItemActions>
         <Switch id={id} checked={profile.enabled} onCheckedChange={onToggle} />
