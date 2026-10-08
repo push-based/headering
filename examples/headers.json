@@ -29,7 +29,7 @@
     {
       "name": "SSR Enabled",
       "enabled": false,
-      "group": "SSR mode",
+      "group": "SSR Skip Condition",
       "requestHeaders": [
         {
           "name": "x-ssr-enabled",
@@ -40,7 +40,7 @@
     {
       "name": "SSR Disabled",
       "enabled": false,
-      "group": "SSR mode",
+      "group": "SSR Skip Condition",
       "requestHeaders": [
         {
           "name": "x-ssr-disabled",
