@@ -208,6 +208,9 @@ function Preview({ config, paused }: { config: Config; paused: boolean }) {
         onConfigChange={noop}
         onPausedChange={noop}
         onOpenOptions={noop}
+        // So the clear buttons the config turns on show too.
+        siteOrigin={new URL(request.url).origin}
+        onClearSiteData={async () => ({})}
       />
     </div>
   );

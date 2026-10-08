@@ -1,4 +1,4 @@
-import { Check, Copy, RotateCw } from 'lucide-react';
+import { Check, Copy } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { Inspect, Tone } from '@/lib/config';
@@ -25,12 +25,10 @@ const shorten = (value: string) => (value.length > 20 ? `${value.slice(0, 12)}â€
 export function DocumentHeaders({
   inspect,
   request,
-  onReload,
 }: {
   inspect: Inspect;
   /** `undefined` while loading, `null` if none was captured. */
   request: DocumentRequest | null | undefined;
-  onReload?: () => void;
 }) {
 
   const showDirection = inspect.requestHeaders.length > 0 && inspect.responseHeaders.length > 0;
@@ -51,14 +49,7 @@ export function DocumentHeaders({
         {request === undefined ? (
           <Skeleton rows={rows.length} />
         ) : request === null ? (
-          <div className="flex items-center gap-2.5 py-2.5 pr-2 pl-3">
-            <p className="flex-1 text-xs text-muted-foreground">Headers are read when the page loads.</p>
-            {onReload && (
-              <Button variant="outline" size="sm" className="bg-background" onClick={onReload}>
-                <RotateCw /> Reload page
-              </Button>
-            )}
-          </div>
+          <p className="px-3 py-2.5 text-center text-xs text-muted-foreground">Headers are read when the page loads.</p>
         ) : (
           <>
             <div className="flex h-10 min-w-0 items-center gap-2 border-b px-2.5">

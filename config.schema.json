@@ -136,6 +136,23 @@
       "additionalProperties": false,
       "description": "Headers of the current page's document request to show in the popup."
     },
+    "clearSiteData": {
+      "type": "object",
+      "properties": {
+        "clear": {
+          "default": false,
+          "description": "Show a button that clears the current site's cookies and storage, leaving the page as it is.",
+          "type": "boolean"
+        },
+        "clearAndReload": {
+          "default": false,
+          "description": "Show a button that clears them and reloads the page as a new visitor.",
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Popup buttons for clearing the current site's data, like DevTools' Clear site data."
+    },
     "profiles": {
       "type": "array",
       "items": {

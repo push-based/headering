@@ -14,7 +14,7 @@ export default defineConfig({
   manifest: {
     name: 'Headering',
     description: 'Modify and inspect HTTP headers.',
-    permissions: ['browsingData', 'declarativeNetRequest', 'scripting', 'storage', 'webRequest'],
+    permissions: ['browsingData', 'cookies', 'declarativeNetRequest', 'scripting', 'storage', 'webRequest'],
     // modifyHeaders rules and webRequest events only apply to URLs the extension has host access to.
     host_permissions: ['<all_urls>'],
   },

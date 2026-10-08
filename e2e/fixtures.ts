@@ -14,7 +14,12 @@ export const test = base.extend<{
   context: async ({}, use) => {
     const context = await chromium.launchPersistentContext('', {
       channel: 'chromium',
-      args: [`--disable-extensions-except=${EXTENSION_PATH}`, `--load-extension=${EXTENSION_PATH}`],
+      args: [
+        `--disable-extensions-except=${EXTENSION_PATH}`,
+        `--load-extension=${EXTENSION_PATH}`,
+        // Any *.test host reaches the local servers, so tests can stand in for third-party sites.
+        '--host-resolver-rules=MAP *.test 127.0.0.1',
+      ],
     });
     await use(context);
     await context.close();

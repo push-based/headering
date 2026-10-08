@@ -29,7 +29,8 @@ Headering is for the moment when you need to send `x-debug: 1` to staging, switc
 - **Page header inspection.** The popup shows the headers you care about from the current page's document request, after redirects. Colour-code values as success, warning or error.
 - **Toolbar badge.** Show one header on each tab's toolbar icon, so a failed render or a cache miss is visible without opening anything.
 - **Pause all.** Turn every profile off at once and get the same set back when you resume.
-- **Reload as a new visitor.** Clear the site's cookies, storage, caches and service workers, then reload.
+- **Reload as a new visitor.** Clear the site's cookies (third-party ones too), storage and service workers, then reload, like DevTools' **Clear site data**.
+- **Clear site data.** The same clearing, without reloading the page.
 - **Shareable config.** Import and export a single JSON file. A JSON Schema gives you validation and autocomplete in your editor, and the extension rejects typos and unknown keys when you import.
 
 ## Install
@@ -132,6 +133,19 @@ An entry can be a header name or an object:
 | `tones` | Maps values to `"success"`, `"warning"` or `"error"` so they show as a coloured tag. Matching ignores case. Keys like `"2xx"` or `"5xx"` match status codes, and an exact value wins over a status class. The card's border takes the colour of the worst tone. |
 | `badge` | Shows this header on the toolbar icon, coloured by its tone. `true` shows ✓ for success, ⚠ for warning and ✕ for error, and shows untoned values as they are. An object like `{ "Failure": "!" }` sets your own text for specific values. About 4 characters fit. Only one header can have a badge. |
 
+### Clearing site data
+
+The popup's buttons for clearing the current site's data are off unless the config turns them on:
+
+```json
+"clearSiteData": { "clear": true, "clearAndReload": true }
+```
+
+| Field | Default | Description |
+| --- | --- | --- |
+| `clear` | `false` | Shows **Clear site data**, which clears without reloading. |
+| `clearAndReload` | `false` | Shows **Reload as a new visitor**, which clears and reloads. |
+
 ### Editor support
 
 [`config.schema.json`](config.schema.json) is generated from the same Zod schema the extension validates against. Point `$schema` at it to get autocomplete and inline errors in VS Code, WebStorm and other editors that support JSON Schema.
@@ -140,7 +154,9 @@ An entry can be a header name or an object:
 
 - **Profile switches** turn individual profiles on and off. Profiles with `options` get a dropdown.
 - **Pause** turns every profile off without changing their switches, so resuming puts back the set you had. The badge shows `off` while Headering is paused. The paused state isn't saved in the config, so exporting doesn't include it.
-- **Reload as a new visitor** clears the current site's cookies, local and session storage, IndexedDB, Cache Storage, HTTP cache and service workers, then reloads the page while skipping the cache. It clears only the page's origin, but Chrome removes cookies for the whole registrable domain. That means clearing `app.example.com` also removes `example.com` cookies, including any login that uses them.
+- **Reload as a new visitor** does what DevTools' **Application → Storage → Clear site data** does with every box ticked. It clears the current site's cookies, local and session storage, IndexedDB, Cache Storage and service workers, plus the third-party cookies: those of every domain the page loaded something from, and those partitioned under the site. Then it reloads every tab on the site. Until they reload, those tabs can't write cookies or storage back, so the reload arrives with no cookies, and the popup confirms it, or lists any that were still sent. The HTTP cache is kept: it doesn't identify a visitor, and clearing it for one site can take a long time. Chrome removes the site's cookies for the whole registrable domain, so clearing `app.example.com` also removes `example.com` cookies, including any login that uses them. Third-party cookies go everywhere, too: if the page loads something from a domain you're signed in to, you're signed out there.
+- **Clear site data** (the eraser) clears the same data but leaves the page as it is. Its scripts keep running, so a site that writes cookies all the time may set some again straight away; use **Reload as a new visitor** to load the page with none.
+- Both buttons show only when [`clearSiteData`](#clearing-site-data) turns them on, and both work in Incognito windows (once Headering is allowed there in `chrome://extensions`): cookies are cleared in the tab's own cookie store, and storage from inside the page.
 - **Inspected headers** show the values from the current page, coloured by their tones.
 
 ## How it works
@@ -155,7 +171,7 @@ Headering turns the config into [`chrome.declarativeNetRequest`](https://develop
 | `webRequest` | Reads the headers of each tab's document request for the popup and badge. |
 | `<all_urls>` host access | Header rules and `webRequest` only work on hosts the extension has access to. |
 | `storage` | Stores the config and the paused state. |
-| `browsingData`, `scripting` | Clear a site's data for **Reload as a new visitor**. |
+| `browsingData`, `cookies`, `scripting` | Clear a site's data, including third-party cookies, for **Clear site data** and **Reload as a new visitor**. |
 
 Headering makes no network requests of its own and doesn't collect any data.
 
@@ -183,7 +199,7 @@ The extension is built with [WXT](https://wxt.dev), React, TypeScript, Tailwind 
 | Path | Contents |
 | --- | --- |
 | `entrypoints/background.ts` | Service worker. Syncs the stored config into DNR rules and records each tab's document request headers. |
-| `entrypoints/popup/` | Profile toggles, pause, reload as a new visitor, and the inspected headers. |
+| `entrypoints/popup/` | Profile toggles, pause, clearing site data, and the inspected headers. |
 | `entrypoints/options/` | Import, edit, preview and export the config. |
 | `lib/config.ts` | Zod schema, parsing and serialisation. This is the source of truth for the config format. |
 | `lib/rules.ts` | Pure mapping from a config to DNR rules. |

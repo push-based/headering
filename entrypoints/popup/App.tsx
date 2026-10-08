@@ -2,7 +2,7 @@ import { Popup } from '@/components/popup/Popup';
 import type { Config } from '@/lib/config';
 import { documentRequestItem, type DocumentRequest } from '@/lib/document';
 import { configItem, pausedItem } from '@/lib/settings';
-import { clearSiteData, siteOrigin } from '@/lib/site';
+import { requestClearSiteData, siteOrigin } from '@/lib/site';
 
 async function inspectedTabId(): Promise<number | undefined> {
   // e2e tests open the popup as a regular tab, so they point it at the page under test.
@@ -72,9 +72,9 @@ function App() {
       onConfigChange={(next) => void configItem.setValue(next)}
       onPausedChange={(value) => void pausedItem.setValue(value)}
       onOpenOptions={openOptions}
-      onReload={tabId === undefined ? undefined : () => void browser.tabs.reload(tabId)}
       siteOrigin={origin}
-      onClearSiteData={tabId === undefined || !origin ? undefined : () => clearSiteData(tabId, origin)}
+      onClearSiteData={tabId === undefined ? undefined : (reload) => requestClearSiteData(tabId, reload)}
+      onReloadExtension={() => browser.runtime.reload()}
     />
   );
 }

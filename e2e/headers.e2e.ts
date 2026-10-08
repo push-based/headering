@@ -160,6 +160,9 @@ test('shows the configured headers of the page\'s document request', async ({ co
   const popup = await context.newPage();
   await popup.goto(extensionUrl(`popup.html?tabId=${tabId}`));
 
+  // This config doesn't turn on the clear buttons.
+  await expect(popup.getByRole('button', { name: /^Clear site data/ })).toHaveCount(0);
+
   const section = popup.getByRole('region', { name: 'Page headers' });
   const value = (name: string) => section.getByRole('term').filter({ hasText: new RegExp(`^${name}$`) }).locator('+ dd');
 
@@ -183,13 +186,13 @@ test('shows the configured headers of the page\'s document request', async ({ co
   await expect.poll(badge).toEqual(['⚠\uFE0E', [250, 204, 21, 255], [66, 32, 6, 255]]);
 });
 
-test('asks for a reload when the page was loaded before the extension', async ({ context, extensionUrl }) => {
+test('says headers come with the next load when the page was loaded before the extension', async ({ context, extensionUrl }) => {
   await setUp(context, extensionUrl);
   const popup = await context.newPage();
   await popup.goto(extensionUrl('popup.html?tabId=999999'));
   const section = popup.getByRole('region', { name: 'Page headers' });
   await expect(section).toContainText('Headers are read when the page loads.');
-  await expect(section.getByRole('button', { name: 'Reload page' })).toBeVisible();
+  await expect(section.getByRole('button')).toHaveCount(0);
 });
 
 test('clearing site data reloads the page as a new visitor', async ({ context, extensionUrl, echoUrl }) => {
@@ -202,6 +205,7 @@ test('clearing site data reloads the page as a new visitor', async ({ context, e
   await other.evaluate(() => (document.cookie = 'other=1'));
 
   const site = await context.newPage();
+  await site.goto(otherUrl);
   await site.goto(echoUrl);
   await site.evaluate(() => {
     document.cookie = 'session=1';
@@ -209,26 +213,98 @@ test('clearing site data reloads the page as a new visitor', async ({ context, e
     sessionStorage.setItem('seen', '1');
   });
   expect(await receivedHeaders(site, echoUrl)).toMatchObject({ cookie: 'session=1' });
+  // A third-party request, like to a login domain or a tracker, carries that domain's own cookies.
+  const thirdPartyUrl = echoUrl.replace('127.0.0.1', 'tracker.test');
+  const tracker = await context.newPage();
+  await tracker.goto(thirdPartyUrl);
+  await tracker.evaluate(() => (document.cookie = 'tracked=1'));
+  await tracker.close();
+  await site.evaluate((url) => fetch(url, { mode: 'no-cors' }), `${thirdPartyUrl}pixel`);
+
+  // Like tracking scripts do, keep writing a cookie so it would land between clearing and reloading,
+  // here and in another tab on the same site.
+  await site.evaluate(() => setInterval(() => (document.cookie = 'tracker=1'), 1));
+  const sibling = await context.newPage();
+  await sibling.goto(`${echoUrl}?sibling`);
+  await sibling.evaluate(() => setInterval(() => (document.cookie = 'sibling=1'), 1));
+
+  const worker = context.serviceWorkers()[0]!;
+  const tabId = await worker.evaluate(async (url) => (await chrome.tabs.query({ url }))[0]?.id, echoUrl);
+  // It reloads in place, without leaving the page.
+  const visited: string[] = [];
+  site.on('framenavigated', (frame) => frame === site.mainFrame() && visited.push(frame.url()));
+  const cookieNames = () => worker.evaluate(async () => (await chrome.cookies.getAll({})).map((c) => `${c.name}@${c.domain}`));
+  expect(await cookieNames()).toContain('tracked@tracker.test');
+  const popup = await context.newPage();
+  await popup.goto(extensionUrl(`popup.html?tabId=${tabId}`));
+  await popup.getByRole('button', { name: 'Clear site data and reload' }).click();
+
+  // The page loads again without any cookie, not even one its scripts wrote while being cleared.
+  // The page is briefly about:blank, with no JSON to read.
+  const cookieSent = async () => {
+    const text = await site.locator('body').textContent();
+    return text ? (JSON.parse(text) as Record<string, string>).cookie ?? 'none' : 'still loading';
+  };
+  await expect.poll(cookieSent).toBe('none');
+  await expect(site).toHaveURL(echoUrl);
+  expect(visited).toEqual([echoUrl]);
+  expect(await site.evaluate(() => [document.cookie, localStorage.length, sessionStorage.length])).toEqual(['', 0, 0]);
+  await expect(popup.getByRole('alert')).toContainText('Reloaded as a new visitor');
+  // A reload keeps history, so Back goes where it did before.
+  await site.goBack();
+  await expect(site).toHaveURL(otherUrl);
+  // The third-party cookie went too, like DevTools' "Clear site data" with third-party cookies.
+  expect(await cookieNames()).not.toContain('tracked@tracker.test');
+  // The other tab on the site reloaded as a new visitor too, and other sites keep their cookies.
+  await expect(sibling).toHaveURL(`${echoUrl}?sibling`);
+  await expect.poll(async () => JSON.parse((await sibling.locator('body').textContent()) || '{}').cookie ?? 'none').toBe('none');
+  expect(await receivedHeaders(other, otherUrl)).toMatchObject({ cookie: 'other=1' });
+});
+
+test('clearing site data without a reload leaves the page as it is', async ({ context, extensionUrl, echoUrl }) => {
+  await setUp(context, extensionUrl);
+  const thirdPartyUrl = echoUrl.replace('127.0.0.1', 'tracker.test');
+  const tracker = await context.newPage();
+  await tracker.goto(thirdPartyUrl);
+  await tracker.evaluate(() => (document.cookie = 'tracked=1'));
+  await tracker.close();
+
+  const site = await context.newPage();
+  await site.goto(echoUrl);
+  await site.evaluate(async (url) => {
+    document.cookie = 'session=1';
+    localStorage.setItem('seen', '1');
+    sessionStorage.setItem('seen', '1');
+    await fetch(url, { mode: 'no-cors' });
+    // Gone if the page reloads.
+    (window as { marker?: number }).marker = 1;
+  }, `${thirdPartyUrl}pixel`);
 
   const worker = context.serviceWorkers()[0]!;
   const tabId = await worker.evaluate(async (url) => (await chrome.tabs.query({ url }))[0]?.id, echoUrl);
   const popup = await context.newPage();
   await popup.goto(extensionUrl(`popup.html?tabId=${tabId}`));
-  await popup.getByRole('button', { name: 'Clear site data and reload' }).click();
+  await popup.getByRole('button', { name: 'Clear site data', exact: true }).click();
+  // The page's session cookie and the third-party one.
+  await expect(popup.getByRole('alert')).toContainText('Removed 2 cookies');
+  await expect(popup.getByRole('alert')).toContainText('None have come back.');
 
-  // The reload itself goes out without the old cookie.
-  await expect.poll(async () => JSON.parse((await site.locator('body').textContent()) ?? '{}')).not.toHaveProperty('cookie');
-  expect(await site.evaluate(() => [document.cookie, localStorage.length, sessionStorage.length])).toEqual(['', 0, 0]);
-  // Other sites keep theirs.
-  expect(await receivedHeaders(other, otherUrl)).toMatchObject({ cookie: 'other=1' });
+  expect(
+    await site.evaluate(() => [document.cookie, localStorage.length, sessionStorage.length, (window as { marker?: number }).marker]),
+  ).toEqual(['', 0, 0, 1]);
+  const cookies = await worker.evaluate(async () => (await chrome.cookies.getAll({})).map((c) => `${c.name}@${c.domain}`));
+  expect(cookies).not.toContain('tracked@tracker.test');
 });
 
-test('there is nothing to clear on browser pages', async ({ context, extensionUrl }) => {
+test('there is nothing to clear on browser pages, and the button says why', async ({ context, extensionUrl }) => {
   await setUp(context, extensionUrl);
   const worker = context.serviceWorkers()[0]!;
   const tabId = await worker.evaluate(async () => (await chrome.tabs.query({ url: 'chrome-extension://*/options.html' }))[0]?.id);
   const popup = await context.newPage();
   await popup.goto(extensionUrl(`popup.html?tabId=${tabId}`));
-  await expect(popup.getByRole('button', { name: 'Settings' })).toBeVisible();
-  await expect(popup.getByRole('button', { name: 'Clear site data and reload' })).toHaveCount(0);
+  await expect(popup.getByRole('button', { name: 'Clear site data', exact: true })).toBeDisabled();
+  const clear = popup.getByRole('button', { name: 'Clear site data and reload' });
+  await expect(clear).toBeDisabled();
+  await clear.locator('..').hover();
+  await expect(popup.getByRole('tooltip')).toContainText('Nothing to clear here');
 });

@@ -15,6 +15,7 @@
       }
     ]
   },
+  "clearSiteData": { "clear": true, "clearAndReload": true },
   "profiles": [
     {
       "name": "SSR Skip Cache",

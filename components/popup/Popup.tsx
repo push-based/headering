@@ -1,6 +1,7 @@
-import { Fragment, useState } from 'react';
-import { FileJson, Pause, Play, Settings } from 'lucide-react';
+import { Fragment, useState, type ReactNode } from 'react';
+import { Eraser, FileJson, Pause, Play, RotateCw, Settings } from 'lucide-react';
 import icon from '@/assets/icon.svg';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
@@ -9,6 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import type { Config, Profile } from '@/lib/config';
 import type { DocumentRequest } from '@/lib/document';
+import { EXTENSION_OUTDATED, type ClearReport } from '@/lib/site';
 import { groupProfiles, setProfileEnabled } from '@/lib/profiles';
 import { cn } from '@/lib/utils';
 import { DocumentHeaders } from './DocumentHeaders';
@@ -29,9 +31,9 @@ export function Popup({
   onConfigChange,
   onPausedChange,
   onOpenOptions,
-  onReload,
   siteOrigin,
   onClearSiteData,
+  onReloadExtension,
 }: {
   config: Config;
   paused: boolean;
@@ -40,21 +42,31 @@ export function Popup({
   onConfigChange: (config: Config) => void;
   onPausedChange: (paused: boolean) => void;
   onOpenOptions: () => void;
-  onReload?: () => void;
-  /** The current page's origin, named in the clear button's tooltip. */
+  /** The current page's origin; without one (browser pages, or sites Headering can't access) there's nothing to clear. */
   siteOrigin?: string;
-  /** Clears the page's cookies and storage and reloads it; the button only shows when set. */
-  onClearSiteData?: () => Promise<void>;
+  /**
+   * Clears the page's cookies and storage, and with `reload` reloads it as a new visitor; the
+   * buttons show when set and turned on in the config. Resolves with what the browser has afterwards.
+   */
+  onClearSiteData?: (reload: boolean) => Promise<ClearReport>;
+  /** Reloads the extension, offered when its background is from an older build than the popup. */
+  onReloadExtension?: () => void;
 }) {
   const [clearing, setClearing] = useState(false);
-  const clearSiteData = async () => {
+  const [clearResult, setClearResult] = useState<ClearResult>();
+  const clearSiteData = async (reload: boolean) => {
     setClearing(true);
+    setClearResult(undefined);
     try {
-      await onClearSiteData?.();
+      const report = await onClearSiteData?.(reload);
+      if (report) setClearResult({ reloaded: reload, ...report });
+    } catch (err) {
+      setClearResult({ error: (err as Error).message });
     } finally {
       setClearing(false);
     }
   };
+  const host = siteOrigin && new URL(siteOrigin).host;
 
   const toggle = (index: number, enabled: boolean) => onConfigChange(setProfileEnabled(config, index, enabled));
 
@@ -95,23 +107,27 @@ export function Popup({
           </Badge>
         )}
         <div className="ml-auto flex items-center gap-1">
-          {onClearSiteData && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={() => void clearSiteData()}
-                  disabled={clearing}
-                  aria-label="Clear site data and reload"
-                >
-                  <RotateCwEraser />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                Reload as a new visitor: clears cookies and storage for {siteOrigin ? new URL(siteOrigin).host : 'this site'}
-              </TooltipContent>
-            </Tooltip>
+          {onClearSiteData && config.clearSiteData?.clear && (
+            <ClearButton
+              label="Clear site data"
+              host={host}
+              disabled={clearing}
+              onClick={() => void clearSiteData(false)}
+              tooltip={`Clear cookies and storage for ${host}, without reloading. The page's scripts may set some again.`}
+            >
+              <Eraser />
+            </ClearButton>
+          )}
+          {onClearSiteData && config.clearSiteData?.clearAndReload && (
+            <ClearButton
+              label="Clear site data and reload"
+              host={host}
+              disabled={clearing}
+              onClick={() => void clearSiteData(true)}
+              tooltip={`Reload as a new visitor: clears cookies and storage for ${host}`}
+            >
+              <RotateCwEraser />
+            </ClearButton>
           )}
           {(config.profiles.length > 0 || paused) && (
             <Tooltip>
@@ -141,7 +157,9 @@ export function Popup({
         </div>
       </header>
 
-      {config.inspect && <DocumentHeaders inspect={config.inspect} request={request} onReload={onReload} />}
+      {clearResult && <ClearResult result={clearResult} onReloadExtension={onReloadExtension} />}
+
+      {config.inspect && <DocumentHeaders inspect={config.inspect} request={request} />}
 
       {config.profiles.length ? (
         <ItemGroup className="min-h-0 gap-2 overflow-y-auto p-3">
@@ -183,6 +201,104 @@ export function Popup({
         </Empty>
       )}
     </div>
+  );
+}
+
+function ClearButton({
+  label,
+  host,
+  disabled,
+  onClick,
+  tooltip,
+  children,
+}: {
+  label: string;
+  /** The page's host; without one there's nothing to clear, and the tooltip says why. */
+  host: string | undefined;
+  disabled: boolean;
+  onClick: () => void;
+  tooltip: string;
+  children: ReactNode;
+}) {
+  return (
+    <Tooltip>
+      {/* A disabled button gets no pointer events, so the wrapper shows the tooltip saying why. */}
+      <TooltipTrigger asChild>
+        <span tabIndex={host ? -1 : 0}>
+          <Button variant="ghost" size="icon-sm" onClick={onClick} disabled={disabled || !host} aria-label={label}>
+            {children}
+          </Button>
+        </span>
+      </TooltipTrigger>
+      <TooltipContent className="max-w-64">
+        {host ? tooltip : "Nothing to clear here. On a website, check that Headering's site access in chrome://extensions includes it."}
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
+type ClearResult = { error: string } | (ClearReport & { reloaded: boolean });
+
+/** What clearing site data did; after a reload, judged by the cookies it actually sent. */
+function ClearResult({ result, onReloadExtension }: { result: ClearResult; onReloadExtension?: () => void }) {
+  if ('error' in result && result.error === EXTENSION_OUTDATED && onReloadExtension) {
+    return (
+      <Alert variant="destructive" className="mx-3 mt-3 w-auto">
+        <AlertTitle>Headering needs a reload</AlertTitle>
+        <AlertDescription>
+          {result.error} Reload it, then open the popup again.
+          <Button size="sm" className="mt-2" onClick={onReloadExtension}>
+            <RotateCw /> Reload Headering
+          </Button>
+        </AlertDescription>
+      </Alert>
+    );
+  }
+  if ('error' in result) {
+    return (
+      <Alert variant="destructive" className="mx-3 mt-3 w-auto">
+        <AlertTitle>Couldn't clear site data</AlertTitle>
+        <AlertDescription>{result.error}</AlertDescription>
+      </Alert>
+    );
+  }
+  if (!result.reloaded) {
+    const { removed = 0, setAgain = [] } = result;
+    return (
+      <Alert className="mx-3 mt-3 w-auto">
+        <AlertTitle>
+          Removed {removed} {removed === 1 ? 'cookie' : 'cookies'} and the site's storage
+        </AlertTitle>
+        {setAgain.length ? (
+          <AlertDescription>
+            <p>Some are already back, set again by the page or, for a site you're signed in to, by Chrome:</p>
+            <ul className="mt-1 flex flex-col gap-1">
+              {setAgain.map(({ domain, names }) => (
+                <li key={domain} className="text-xs break-all">
+                  <span className="font-medium text-foreground">{domain}</span>{' '}
+                  <span className="font-mono">{names.join(', ')}</span>
+                </li>
+              ))}
+            </ul>
+          </AlertDescription>
+        ) : (
+          <AlertDescription>None have come back.</AlertDescription>
+        )}
+      </Alert>
+    );
+  }
+  const { cookiesSent } = result;
+  if (!cookiesSent) return null; // The reload wasn't seen, so there's nothing to report.
+  return cookiesSent.length ? (
+    <Alert variant="destructive" className="mx-3 mt-3 w-auto">
+      <AlertTitle>The reload still sent cookies</AlertTitle>
+      <AlertDescription className="font-mono text-xs break-all">{cookiesSent.join(', ')}</AlertDescription>
+    </Alert>
+  ) : (
+    <Alert className="mx-3 mt-3 w-auto">
+      <AlertTitle>Reloaded as a new visitor</AlertTitle>
+      <AlertDescription>The page loaded without any cookies.</AlertDescription>
+    </Alert>
   );
 }
 

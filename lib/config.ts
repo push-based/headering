@@ -138,11 +138,25 @@ const Inspect = z
   })
   .describe("Headers of the current page's document request to show in the popup.");
 
+const ClearSiteData = z
+  .strictObject({
+    clear: z
+      .boolean()
+      .default(false)
+      .describe("Show a button that clears the current site's cookies and storage, leaving the page as it is."),
+    clearAndReload: z
+      .boolean()
+      .default(false)
+      .describe('Show a button that clears them and reloads the page as a new visitor.'),
+  })
+  .describe("Popup buttons for clearing the current site's data, like DevTools' Clear site data.");
+
 export const Config = z
   .strictObject({
     $schema: z.string().optional(),
     version: z.literal(1),
     inspect: Inspect.optional(),
+    clearSiteData: ClearSiteData.optional(),
     profiles: z.array(Profile),
   })
   .superRefine((config, ctx) => {
@@ -164,6 +178,7 @@ export type Config = z.output<typeof Config>;
 export type Profile = z.output<typeof Profile>;
 export type Header = z.output<typeof Header>;
 export type Inspect = z.output<typeof Inspect>;
+export type ClearSiteData = z.output<typeof ClearSiteData>;
 
 export const EMPTY_CONFIG: Config = { version: 1, profiles: [] };
 
@@ -205,6 +220,12 @@ export function serializeConfig(config: Config): string {
           ...(inspect.responseHeaders.length > 0 && { responseHeaders: inspect.responseHeaders.map(inspectHeaderToJson) }),
         },
       }),
+    ...((config.clearSiteData?.clear || config.clearSiteData?.clearAndReload) && {
+      clearSiteData: {
+        ...(config.clearSiteData.clear && { clear: true }),
+        ...(config.clearSiteData.clearAndReload && { clearAndReload: true }),
+      },
+    }),
     profiles: config.profiles.map((profile) => ({
       name: profile.name,
       enabled: profile.enabled,

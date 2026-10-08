@@ -124,6 +124,27 @@ describe('parseConfig', () => {
     });
   });
 
+  describe('clearSiteData', () => {
+    it('turns each button on separately, both off by default', () => {
+      const result = parse({ version: 1, clearSiteData: { clear: true }, profiles: [] });
+      expect(result.ok && result.config.clearSiteData).toEqual({ clear: true, clearAndReload: false });
+    });
+
+    it('rejects unknown buttons', () => {
+      const result = parse({ version: 1, clearSiteData: { reload: true }, profiles: [] });
+      expect(result.ok).toBe(false);
+    });
+
+    it('round-trips through serializeConfig, leaving out what is off', () => {
+      const result = parse({ version: 1, clearSiteData: { clear: false, clearAndReload: true }, profiles: [] });
+      if (!result.ok) throw new Error(result.errors.join('\n'));
+      expect(JSON.parse(serializeConfig(result.config)).clearSiteData).toEqual({ clearAndReload: true });
+      const off = parse({ version: 1, clearSiteData: {}, profiles: [] });
+      if (!off.ok) throw new Error(off.errors.join('\n'));
+      expect(JSON.parse(serializeConfig(off.config))).not.toHaveProperty('clearSiteData');
+    });
+  });
+
   describe('groups', () => {
     const grouped = (aEnabled: boolean, bEnabled: boolean) =>
       parse({

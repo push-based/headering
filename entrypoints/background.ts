@@ -2,6 +2,7 @@ import type { Tone } from '@/lib/config';
 import { badgeOf, documentRequestItem, type DocumentRequest } from '@/lib/document';
 import { buildRules } from '@/lib/rules';
 import { configItem, pausedItem } from '@/lib/settings';
+import { handleClearSiteData } from '@/lib/site';
 
 const BADGE_COLOR = '#4F46E5';
 const PAUSED_BADGE_COLOR = '#737373';
@@ -108,4 +109,5 @@ export default defineBackground(() => {
   browser.runtime.onInstalled.addListener(sync);
 
   trackDocumentRequests();
+  handleClearSiteData();
 });
