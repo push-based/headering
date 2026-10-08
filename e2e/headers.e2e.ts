@@ -148,10 +148,10 @@ test('shows the configured headers of the page\'s document request', async ({ co
   // The toolbar icon shows the badge header's tone as a symbol.
   const badge = () =>
     worker.evaluate(
-      async (tabId) => [
-        await chrome.action.getBadgeText({ tabId }),
-        await chrome.action.getBadgeBackgroundColor({ tabId }),
-        await chrome.action.getBadgeTextColor({ tabId }),
+      async (id) => [
+        await chrome.action.getBadgeText({ tabId: id }),
+        await chrome.action.getBadgeBackgroundColor({ tabId: id }),
+        await chrome.action.getBadgeTextColor({ tabId: id }),
       ],
       tabId,
     );

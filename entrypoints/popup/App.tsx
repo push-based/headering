@@ -22,12 +22,12 @@ function useDocumentRequest() {
     let unwatch: (() => void) | undefined;
     let cancelled = false;
 
-    void inspectedTabId().then(async (tabId) => {
-      if (tabId === undefined) return setRequest(null);
-      const item = documentRequestItem(tabId);
-      const [value, tab] = await Promise.all([item.getValue(), browser.tabs.get(tabId).catch(() => undefined)]);
+    void inspectedTabId().then(async (id) => {
+      if (id === undefined) return setRequest(null);
+      const item = documentRequestItem(id);
+      const [value, tab] = await Promise.all([item.getValue(), browser.tabs.get(id).catch(() => undefined)]);
       if (cancelled) return;
-      setTabId(tabId);
+      setTabId(id);
       setOrigin(siteOrigin(tab?.url));
       setRequest(value);
       unwatch = item.watch(setRequest);

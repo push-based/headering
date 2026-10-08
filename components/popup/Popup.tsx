@@ -232,6 +232,8 @@ function ProfileItem({
 
       {HEADER_LISTS.flatMap((list) =>
         profile[list].map((header, h) => (
+          // Headers have no id of their own, and the list only changes when a new config is applied.
+          // oxlint-disable-next-line react/no-array-index-key
           <ItemFooter key={`${list}-${h}`} className="w-full">
             {header.options ? (
               <OptionPicker header={header} onChange={(value) => onHeaderValue(list, h, value)} />

@@ -1,0 +1,45 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "typescript",
+    "react",
+    "unicorn",
+    "oxc",
+    "import",
+    "jsx-a11y",
+    "vitest"
+  ],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "perf": "warn"
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "es2024": true
+  },
+  "ignorePatterns": [
+    "dist",
+    ".wxt",
+    "config.schema.json",
+    "components/ui"
+  ],
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "import/no-unassigned-import": "off",
+    "jsx-a11y/prefer-tag-over-role": "off",
+    "unicorn/consistent-function-scoping": "off",
+    "oxc/no-map-spread": "off"
+  },
+  "overrides": [
+    {
+      "files": [
+        "e2e/**"
+      ],
+      "rules": {
+        "no-empty-pattern": "off"
+      }
+    }
+  ]
+}

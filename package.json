@@ -1,10 +1,11 @@
 {
   "name": "headering",
-  "description": "Modify HTTP request headers.",
+  "description": "Modify and inspect HTTP headers.",
   "private": true,
   "license": "MIT",
   "version": "0.0.0",
   "type": "module",
+  "packageManager": "pnpm@12.6.0",
   "scripts": {
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",
@@ -13,11 +14,13 @@
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
     "compile": "tsc --noEmit",
+    "lint": "oxlint --deny-warnings",
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "wxt build && playwright test",
     "postinstall": "wxt prepare",
-    "schema": "node scripts/generate-schema.ts"
+    "schema": "node scripts/generate-schema.ts",
+    "prepare": "husky"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.3.0",
@@ -32,12 +35,15 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.2.3",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@wxt-dev/auto-icons": "^1.1.2",
     "@wxt-dev/module-react": "^1.1.5",
+    "husky": "^9.1.7",
+    "oxlint": "^1.87.0",
     "shadcn": "^4.21.3",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3",

@@ -10,7 +10,7 @@ const sortKeysDeep = (value: unknown): unknown =>
     : value && typeof value === 'object'
       ? Object.fromEntries(
           Object.entries(value)
-            .sort(([a], [b]) => a.localeCompare(b))
+            .toSorted(([a], [b]) => a.localeCompare(b))
             .map(([k, v]) => [k, sortKeysDeep(v)]),
         )
       : value;
@@ -44,8 +44,7 @@ describe('parseConfig', () => {
 
   it('reports invalid JSON', () => {
     const result = parseConfig('{ nope');
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.errors[0]).toMatch(/^Invalid JSON/);
+    expect(result).toEqual({ ok: false, errors: [expect.stringMatching(/^Invalid JSON/)] });
   });
 
   it('reports errors with their path', () => {
@@ -54,11 +53,13 @@ describe('parseConfig', () => {
       profiles: [{ name: 'Bad', domains: ['https://example.com'], requestHeaders: [{ name: 'X Bad', value: '1' }] }],
     });
 
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect(result.errors).toContainEqual(expect.stringMatching(/^profiles\.0\.domains\.0: /));
-      expect(result.errors).toContainEqual('profiles.0.requestHeaders.0.name: Invalid header name');
-    }
+    expect(result).toEqual({
+      ok: false,
+      errors: expect.arrayContaining([
+        expect.stringMatching(/^profiles\.0\.domains\.0: /),
+        'profiles.0.requestHeaders.0.name: Invalid header name',
+      ]),
+    });
   });
 
   it('rejects unknown keys so typos are caught', () => {

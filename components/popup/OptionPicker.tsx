@@ -49,6 +49,8 @@ export function OptionPicker({ header, onChange }: { header: Header; onChange: (
           <Button
             variant="outline"
             size="sm"
+            // Radix's PopoverTrigger adds aria-controls at runtime.
+            // oxlint-disable-next-line jsx-a11y/role-has-required-aria-props
             role="combobox"
             aria-expanded={open}
             aria-label={header.name}
