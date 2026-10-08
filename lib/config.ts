@@ -59,10 +59,54 @@ const Profile = z.strictObject({
   responseHeaders: z.array(Header).default([]),
 });
 
+export const TONES = ['success', 'warning', 'error'] as const;
+export type Tone = (typeof TONES)[number];
+
+export interface ToneRule {
+  /** An exact value (case-insensitive) or a status class like "5xx". */
+  match: string;
+  tone: Tone;
+}
+
+export interface InspectHeader {
+  name: string;
+  tones?: ToneRule[];
+}
+
+const InspectHeader = z
+  .union([
+    HeaderName,
+    z
+      .strictObject({
+        name: HeaderName,
+        tones: z
+          // Checked below rather than with z.enum: inside a union, a failing enum only reports "Invalid input".
+          .record(z.string().min(1), z.string().meta({ enum: [...TONES] }))
+          .optional()
+          .describe(
+            'Value → "success", "warning" or "error", shown as a coloured tag in the popup. ' +
+              'Values match case-insensitively; keys like "2xx" match status codes.',
+          ),
+      })
+      .superRefine((h, ctx) => {
+        for (const [match, tone] of Object.entries(h.tones ?? {})) {
+          if (!(TONES as readonly string[]).includes(tone)) {
+            ctx.addIssue({ code: 'custom', message: 'Tone must be "success", "warning" or "error"', path: ['tones', match] });
+          }
+        }
+      }),
+  ])
+  // chrome.storage sorts object keys, so keep tones as an ordered list internally.
+  .transform((h): InspectHeader => {
+    if (typeof h === 'string') return { name: h };
+    if (!h.tones) return { name: h.name };
+    return { name: h.name, tones: Object.entries(h.tones).map(([match, tone]) => ({ match, tone: tone as Tone })) };
+  });
+
 const Inspect = z
   .strictObject({
-    requestHeaders: z.array(HeaderName).default([]),
-    responseHeaders: z.array(HeaderName).default([]),
+    requestHeaders: z.array(InspectHeader).default([]),
+    responseHeaders: z.array(InspectHeader).default([]),
   })
   .describe("Headers of the current page's document request to show in the popup.");
 
@@ -129,8 +173,8 @@ export function serializeConfig(config: Config): string {
     ...(inspect &&
       (inspect.requestHeaders.length > 0 || inspect.responseHeaders.length > 0) && {
         inspect: {
-          ...(inspect.requestHeaders.length > 0 && { requestHeaders: inspect.requestHeaders }),
-          ...(inspect.responseHeaders.length > 0 && { responseHeaders: inspect.responseHeaders }),
+          ...(inspect.requestHeaders.length > 0 && { requestHeaders: inspect.requestHeaders.map(inspectHeaderToJson) }),
+          ...(inspect.responseHeaders.length > 0 && { responseHeaders: inspect.responseHeaders.map(inspectHeaderToJson) }),
         },
       }),
     profiles: config.profiles.map((profile) => ({
@@ -152,4 +196,10 @@ function headerToJson(header: Header) {
     ...(header.value !== undefined && { value: header.value }),
     ...(header.options && { options: Object.fromEntries(header.options.map((o) => [o.label, o.value])) }),
   };
+}
+
+/** Plain names stay plain; only headers with tones need the object form. */
+function inspectHeaderToJson(header: InspectHeader) {
+  if (!header.tones) return header.name;
+  return { name: header.name, tones: Object.fromEntries(header.tones.map((t) => [t.match, t.tone])) };
 }

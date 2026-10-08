@@ -190,8 +190,8 @@ function App() {
 
 function Preview({ config }: { config: Config }) {
   const inspected = [
-    ...(config.inspect?.requestHeaders.map((name) => ({ direction: 'request' as const, name })) ?? []),
-    ...(config.inspect?.responseHeaders.map((name) => ({ direction: 'response' as const, name })) ?? []),
+    ...(config.inspect?.requestHeaders.map((header) => ({ direction: 'request' as const, header })) ?? []),
+    ...(config.inspect?.responseHeaders.map((header) => ({ direction: 'response' as const, header })) ?? []),
   ];
 
   return (
@@ -205,10 +205,15 @@ function Preview({ config }: { config: Config }) {
             <ItemDescription>Read from the current page's document request.</ItemDescription>
           </ItemContent>
           <ItemFooter className="flex-col items-stretch gap-1.5">
-            {inspected.map(({ direction, name }) => (
-              <div key={`${direction}-${name}`} className="flex min-w-0 items-center gap-2 text-xs">
+            {inspected.map(({ direction, header }) => (
+              <div key={`${direction}-${header.name}`} className="flex min-w-0 items-center gap-2 text-xs">
                 <DirectionBadge direction={direction} />
-                <code className="truncate font-mono">{name}</code>
+                <code className="truncate font-mono">{header.name}</code>
+                {header.tones && (
+                  <Badge variant="outline" className="ml-auto shrink-0" title={header.tones.map((t) => `${t.match} → ${t.tone}`).join('\n')}>
+                    {header.tones.length} {header.tones.length === 1 ? 'tone' : 'tones'}
+                  </Badge>
+                )}
               </div>
             ))}
           </ItemFooter>

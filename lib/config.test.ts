@@ -154,7 +154,7 @@ describe('parseConfig', () => {
       const result = parse({ version: 1, inspect: { responseHeaders: ['x-ssr-status'] }, profiles: [] });
       if (!result.ok) throw new Error('expected valid config');
 
-      expect(result.config.inspect).toEqual({ requestHeaders: [], responseHeaders: ['x-ssr-status'] });
+      expect(result.config.inspect).toEqual({ requestHeaders: [], responseHeaders: [{ name: 'x-ssr-status' }] });
       expect(JSON.parse(serializeConfig(result.config))).toEqual({
         version: 1,
         inspect: { responseHeaders: ['x-ssr-status'] },
@@ -172,6 +172,43 @@ describe('parseConfig', () => {
       expect(parse({ version: 1, inspect: { responseHeaders: ['x ssr'] }, profiles: [] })).toEqual({
         ok: false,
         errors: ['inspect.responseHeaders.0: Invalid header name'],
+      });
+    });
+
+    it('keeps tones in file order, even after chrome.storage sorts their keys', () => {
+      const tones = { Fresh: 'success', Skipped: 'warning', 'No answer': 'error' };
+      const result = parse({
+        version: 1,
+        inspect: { responseHeaders: ['x-ssr-request-id', { name: 'x-ssr-status', tones }] },
+        profiles: [],
+      });
+      if (!result.ok) throw new Error('expected valid config');
+
+      expect(result.config.inspect?.responseHeaders[1]).toEqual({
+        name: 'x-ssr-status',
+        tones: [
+          { match: 'Fresh', tone: 'success' },
+          { match: 'Skipped', tone: 'warning' },
+          { match: 'No answer', tone: 'error' },
+        ],
+      });
+
+      const stored = sortKeysDeep(result.config) as typeof result.config;
+      const json = JSON.parse(serializeConfig(stored));
+      expect(json.inspect.responseHeaders).toEqual(['x-ssr-request-id', { name: 'x-ssr-status', tones }]);
+      expect(Object.keys(json.inspect.responseHeaders[1].tones)).toEqual(['Fresh', 'Skipped', 'No answer']);
+    });
+
+    it('rejects unknown tones and keys', () => {
+      expect(
+        parse({ version: 1, inspect: { responseHeaders: [{ name: 'x-ssr-status', tones: { Fresh: 'green' } }] }, profiles: [] }),
+      ).toEqual({
+        ok: false,
+        errors: ['inspect.responseHeaders.0.tones.Fresh: Tone must be "success", "warning" or "error"'],
+      });
+      expect(parse({ version: 1, inspect: { responseHeaders: [{ name: 'x-ssr-status', tone: {} }] }, profiles: [] })).toEqual({
+        ok: false,
+        errors: ['inspect.responseHeaders.0: Unrecognized key: "tone"'],
       });
     });
   });

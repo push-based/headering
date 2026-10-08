@@ -13,19 +13,83 @@
       "type": "object",
       "properties": {
         "requestHeaders": {
-          "default": [],
           "type": "array",
           "items": {
-            "type": "string",
-            "pattern": "^[!#$%&'*+.^_`|~0-9A-Za-z-]+$"
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[!#$%&'*+.^_`|~0-9A-Za-z-]+$"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "pattern": "^[!#$%&'*+.^_`|~0-9A-Za-z-]+$"
+                  },
+                  "tones": {
+                    "description": "Value → \"success\", \"warning\" or \"error\", shown as a coloured tag in the popup. Values match case-insensitively; keys like \"2xx\" match status codes.",
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "additionalProperties": {
+                      "type": "string",
+                      "enum": [
+                        "success",
+                        "warning",
+                        "error"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "additionalProperties": false
+              }
+            ]
           }
         },
         "responseHeaders": {
-          "default": [],
           "type": "array",
           "items": {
-            "type": "string",
-            "pattern": "^[!#$%&'*+.^_`|~0-9A-Za-z-]+$"
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[!#$%&'*+.^_`|~0-9A-Za-z-]+$"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "pattern": "^[!#$%&'*+.^_`|~0-9A-Za-z-]+$"
+                  },
+                  "tones": {
+                    "description": "Value → \"success\", \"warning\" or \"error\", shown as a coloured tag in the popup. Values match case-insensitively; keys like \"2xx\" match status codes.",
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "additionalProperties": {
+                      "type": "string",
+                      "enum": [
+                        "success",
+                        "warning",
+                        "error"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "additionalProperties": false
+              }
+            ]
           }
         }
       },

@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { FileJson, Link2, Pause, Play, Settings } from 'lucide-react';
+import { FileJson, Pause, Play, Settings } from 'lucide-react';
 import icon from '@/assets/icon.svg';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -125,11 +125,7 @@ function App() {
                 aria-label={`${entry.name}, one at a time`}
                 className="rounded-lg border"
               >
-                <div className="flex items-center gap-1.5 px-3 pt-2 text-xs text-muted-foreground">
-                  <Link2 className="size-3.5" />
-                  <span className="font-medium text-foreground">{entry.name}</span>
-                  <span>· one at a time</span>
-                </div>
+                <div className="px-3 pt-2 text-xs font-medium">{entry.name}</div>
                 <div className="p-1">
                   {entry.indexes.map((index, n) => (
                     <Fragment key={index}>

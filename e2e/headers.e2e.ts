@@ -129,7 +129,11 @@ test('shows the configured headers of the page\'s document request', async ({ co
     version: 1,
     inspect: {
       requestHeaders: ['x-ssr-skip-cache'],
-      responseHeaders: ['x-ssr-request-id', 'x-ssr-status', 'x-ssr-status-code'],
+      responseHeaders: [
+        'x-ssr-request-id',
+        { name: 'x-ssr-status', tones: { hit: 'success', miss: 'warning' } },
+        'x-ssr-status-code',
+      ],
     },
     profiles: [{ name: 'SSR Skip Cache', requestHeaders: [{ name: 'x-ssr-skip-cache', value: '1' }] }],
   };
@@ -146,11 +150,16 @@ test('shows the configured headers of the page\'s document request', async ({ co
   const section = popup.getByRole('region', { name: 'Page headers' });
   const value = (name: string) => section.getByRole('term').filter({ hasText: new RegExp(`^${name}$`) }).locator('+ dd');
 
-  await expect(section).toContainText(echoUrl);
+  // The host is shown; the full URL is in the title.
+  await expect(section).toContainText(new URL(echoUrl).host);
+  await expect(section.getByTitle(echoUrl, { exact: true })).toBeVisible();
   await expect(section.getByLabel('Status code')).toHaveText('200');
   // Request headers include the ones added by the extension's own rules.
   await expect(value('x-ssr-skip-cache')).toHaveText('1');
   await expect(value('x-ssr-status')).toHaveText('HIT');
+  // Tones match case-insensitively.
+  await expect(value('x-ssr-status')).toHaveAttribute('data-tone', 'success');
+  await expect(value('x-ssr-request-id')).not.toHaveAttribute('data-tone');
   await expect(value('x-ssr-status-code')).toHaveText('not set');
 
   // Updates live when the page reloads.
@@ -164,5 +173,7 @@ test('asks for a reload when the page was loaded before the extension', async ({
   await setUp(context, extensionUrl);
   const popup = await context.newPage();
   await popup.goto(extensionUrl('popup.html?tabId=999999'));
-  await expect(popup.getByRole('region', { name: 'Page headers' })).toHaveText('Reload the page to see its headers.');
+  const section = popup.getByRole('region', { name: 'Page headers' });
+  await expect(section).toContainText('Headers are read when the page loads.');
+  await expect(section.getByRole('button', { name: 'Reload page' })).toBeVisible();
 });
