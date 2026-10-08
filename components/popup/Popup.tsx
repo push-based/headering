@@ -118,17 +118,17 @@ export function Popup({
                 key={`group-${entry.name}`}
                 role="group"
                 aria-label={`${entry.name}, one at a time`}
-                className="rounded-lg border"
+                className="overflow-hidden rounded-lg border"
               >
-                <div className="px-3 pt-2 text-xs font-medium">{entry.name}</div>
-                <div className="p-1">
-                  {entry.indexes.map((index, n) => (
-                    <Fragment key={index}>
-                      {n > 0 && <ItemSeparator className="mx-2 my-1 w-auto" />}
-                      {renderProfile(index, true)}
-                    </Fragment>
-                  ))}
+                <div className="border-b bg-muted/40 px-3 py-1.5 text-xs font-medium text-muted-foreground">
+                  {entry.name}
                 </div>
+                {entry.indexes.map((index, n) => (
+                  <Fragment key={index}>
+                    {n > 0 && <ItemSeparator className="my-0" />}
+                    {renderProfile(index, true)}
+                  </Fragment>
+                ))}
               </div>
             ),
           )}
@@ -171,8 +171,8 @@ function ProfileItem({
       variant={grouped ? 'default' : 'outline'}
       size="sm"
       className={cn(
-        grouped && 'px-2',
-        profile.enabled && !paused && (grouped ? 'bg-muted' : 'border-primary/40 bg-muted/50'),
+        grouped && 'rounded-none',
+        profile.enabled && !paused && (grouped ? 'bg-muted/50' : 'border-primary/40 bg-muted/50'),
       )}
     >
       <ItemContent className="min-w-0">
