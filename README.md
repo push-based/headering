@@ -1,8 +1,25 @@
+<div align="center">
+
+<img src="assets/icon.svg" alt="" width="96" height="96">
+
 # Headering
 
-A Chrome extension that modifies HTTP request and response headers and shows you the headers of the page you're on, all driven by a JSON config you can share with your team.
+**Modify and inspect HTTP headers in Chrome, driven by a JSON config you can share with your team.**
+
+[![CI](https://github.com/push-based/headering/actions/workflows/ci.yml/badge.svg)](https://github.com/push-based/headering/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+![Manifest V3](https://img.shields.io/badge/manifest-v3-4F46E5.svg)
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/popup-dark.png">
+  <img src="docs/images/popup-light.png" alt="The Headering popup showing the current page's response headers as coloured tags, followed by header profiles with on/off switches, a group of mutually exclusive profiles, and a dropdown of preset values." width="360">
+</picture>
+
+</div>
 
 Headering is for the moment when you need to send `x-debug: 1` to staging, switch a header between a handful of preset values, or check at a glance whether the page you're looking at was served from cache. You describe that once in a config file, and from then on it's a toggle in the toolbar popup.
+
+**Contents:** [Features](#features) · [Install](#install) · [Quick start](#quick-start) · [Configuration](#configuration) · [The popup](#the-popup) · [How it works](#how-it-works) · [Development](#development) · [Contributing](#contributing)
 
 ## Features
 
@@ -33,6 +50,12 @@ Then open `chrome://extensions`, turn on **Developer mode**, click **Load unpack
 1. Right-click the Headering icon and choose **Options**.
 2. Import a config with the file picker, by dragging and dropping, or by pasting. Try [`examples/staging.json`](examples/staging.json) or [`examples/headers.json`](examples/headers.json).
 3. Check the preview, then click **Apply**.
+
+   <picture>
+     <source media="(prefers-color-scheme: dark)" srcset="docs/images/options-dark.png">
+     <img src="docs/images/options-light.png" alt="The options page with the JSON config in an editor on the left and a live preview of the popup on the right." width="800">
+   </picture>
+
 4. Open the popup from the toolbar to switch profiles on and off.
 
 Reload any tabs that were open before you installed the extension. The popup can only show headers for requests made after the extension loaded.
@@ -143,12 +166,15 @@ You need Node.js 22.18 or newer and [pnpm](https://pnpm.io).
 ```bash
 pnpm dev        # launch Chrome with the extension loaded and hot reload
 pnpm compile    # type-check
+pnpm lint       # lint with oxlint
 pnpm test       # unit tests (Vitest with the WXT fake browser)
 pnpm e2e        # build, then load the extension in Chromium and check real requests (Playwright)
 pnpm schema     # regenerate config.schema.json
 pnpm build      # production build to dist/chrome-mv3
 pnpm zip        # package for the Chrome Web Store
 ```
+
+Commit messages are checked by [commitlint](https://commitlint.js.org) and the code by oxlint, through Git hooks that `pnpm install` sets up. CI runs the linter, type-check, unit tests and e2e tests on every push and pull request.
 
 The extension is built with [WXT](https://wxt.dev), React, TypeScript, Tailwind CSS and [shadcn/ui](https://ui.shadcn.com).
 
@@ -167,6 +193,7 @@ The extension is built with [WXT](https://wxt.dev), React, TypeScript, Tailwind 
 | `components/ui/` | shadcn/ui components. Add more with `pnpm dlx shadcn@latest add <name>`. |
 | `assets/tailwind.css` | Tailwind and the shadcn theme. Dark mode follows the OS. |
 | `examples/` | Example configs. |
+| `docs/images/` | Screenshots used in this README. |
 | `e2e/` | Playwright tests against the built extension. |
 
 If you change the config format in `lib/config.ts`, run `pnpm schema` and commit the updated `config.schema.json`.

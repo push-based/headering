@@ -37,6 +37,7 @@ pnpm dev
 4. Check that everything passes:
 
    ```bash
+   pnpm lint
    pnpm compile
    pnpm test
    pnpm e2e
@@ -57,6 +58,7 @@ Don't break existing configs. If an incompatible change can't be avoided, raise 
 
 ### Code style
 
+- `pnpm lint` runs [oxlint](https://oxc.rs/docs/guide/usage/linter) and has to pass without warnings. It also runs before each commit. If a rule is wrong in one place, disable it for that line with a comment that says why.
 - Match the code around your change. The project uses TypeScript in strict mode, React function components, Tailwind and shadcn/ui.
 - Keep logic that doesn't need the browser, such as `lib/rules.ts`, as pure functions so it's easy to test.
 - Write comments that explain why, not what.
@@ -64,6 +66,8 @@ Don't break existing configs. If an incompatible change can't be avoided, raise 
 ### Commit messages
 
 Write the subject line as a short imperative sentence that describes the change from the user's point of view, such as `Add pause all to the popup` or `Keep option labels on one line in the picker`. Don't use type prefixes like `feat:`. Use the body for anything that needs more explanation.
+
+[commitlint](https://commitlint.js.org) checks this when you commit, through a hook that `pnpm install` sets up, and again in CI for pull requests. The rules are in `commitlint.config.js`.
 
 ## License
 
