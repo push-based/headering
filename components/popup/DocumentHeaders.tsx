@@ -2,44 +2,8 @@ import { Check, Copy, RotateCw } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { Inspect, Tone } from '@/lib/config';
-import { documentRequestItem, findHeader, toneOf, worstTone, type DocumentRequest } from '@/lib/document';
+import { findHeader, toneOf, worstTone, type DocumentRequest } from '@/lib/document';
 import { cn } from '@/lib/utils';
-
-async function inspectedTabId(): Promise<number | undefined> {
-  // e2e tests open the popup as a regular tab, so they point it at the page under test.
-  const param = Number(new URLSearchParams(location.search).get('tabId'));
-  if (param) return param;
-  const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
-  return tab?.id;
-}
-
-/** The active tab's latest document request; `undefined` while loading, `null` if none was captured. */
-function useDocumentRequest() {
-  const [tabId, setTabId] = useState<number>();
-  const [request, setRequest] = useState<DocumentRequest | null>();
-
-  useEffect(() => {
-    let unwatch: (() => void) | undefined;
-    let cancelled = false;
-
-    void inspectedTabId().then(async (tabId) => {
-      if (tabId === undefined) return setRequest(null);
-      const item = documentRequestItem(tabId);
-      const value = await item.getValue();
-      if (cancelled) return;
-      setTabId(tabId);
-      setRequest(value);
-      unwatch = item.watch(setRequest);
-    });
-
-    return () => {
-      cancelled = true;
-      unwatch?.();
-    };
-  }, []);
-
-  return { tabId, request };
-}
 
 const TONE_TAG: Record<Tone, string> = {
   success: 'bg-green-100 text-green-800 dark:bg-green-500/15 dark:text-green-400',
@@ -58,8 +22,16 @@ const TONE_BORDER: Record<Tone, string> = {
 const shorten = (value: string) => (value.length > 20 ? `${value.slice(0, 12)}…${value.slice(-5)}` : value);
 
 /** Shows the configured headers of the page's document request. */
-export function DocumentHeaders({ inspect }: { inspect: Inspect }) {
-  const { tabId, request } = useDocumentRequest();
+export function DocumentHeaders({
+  inspect,
+  request,
+  onReload,
+}: {
+  inspect: Inspect;
+  /** `undefined` while loading, `null` if none was captured. */
+  request: DocumentRequest | null | undefined;
+  onReload?: () => void;
+}) {
 
   const showDirection = inspect.requestHeaders.length > 0 && inspect.responseHeaders.length > 0;
   const rows = [
@@ -81,8 +53,8 @@ export function DocumentHeaders({ inspect }: { inspect: Inspect }) {
         ) : request === null ? (
           <div className="flex items-center gap-2.5 py-2.5 pr-2 pl-3">
             <p className="flex-1 text-xs text-muted-foreground">Headers are read when the page loads.</p>
-            {tabId !== undefined && (
-              <Button variant="outline" size="sm" className="bg-background" onClick={() => void browser.tabs.reload(tabId)}>
+            {onReload && (
+              <Button variant="outline" size="sm" className="bg-background" onClick={onReload}>
                 <RotateCw /> Reload page
               </Button>
             )}

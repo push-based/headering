@@ -1,15 +1,15 @@
 import type { ChangeEvent, DragEvent } from 'react';
-import { Check, CircleAlert, Copy, Download, Eye, Globe, Link2, TriangleAlert, Upload } from 'lucide-react';
+import { Check, CircleAlert, Copy, Download, Upload } from 'lucide-react';
 import icon from '@/assets/icon.svg';
+import { Popup } from '@/components/popup/Popup';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
-import { Item, ItemContent, ItemDescription, ItemFooter, ItemGroup, ItemTitle } from '@/components/ui/item';
 import { Textarea } from '@/components/ui/textarea';
-import { parseConfig, serializeConfig, type Config, type Header } from '@/lib/config';
-import { configItem } from '@/lib/settings';
+import { parseConfig, serializeConfig, type Config, type InspectHeader } from '@/lib/config';
+import type { DocumentRequest } from '@/lib/document';
+import { configItem, pausedItem } from '@/lib/settings';
 import { cn } from '@/lib/utils';
 
 function App() {
@@ -17,6 +17,7 @@ function App() {
   const [text, setText] = useState('');
   const [status, setStatus] = useState('');
   const [dragging, setDragging] = useState(false);
+  const [paused, setPaused] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -30,6 +31,11 @@ function App() {
       setSaved(next);
       setText((current) => (current === serializeConfig(prev) ? serializeConfig(next) : current));
     });
+  }, []);
+
+  useEffect(() => {
+    pausedItem.getValue().then(setPaused);
+    return pausedItem.watch(setPaused);
   }, []);
 
   const result = useMemo(() => parseConfig(text), [text]);
@@ -148,11 +154,11 @@ function App() {
           <Card>
             <CardHeader>
               <CardTitle>Preview</CardTitle>
-              <CardDescription>What will be applied, profile by profile.</CardDescription>
+              <CardDescription>How the popup will look once applied.</CardDescription>
             </CardHeader>
             <CardContent>
               {result.ok ? (
-                <Preview config={result.config} />
+                <Preview config={result.config} paused={paused} />
               ) : (
                 <Alert variant="destructive">
                   <CircleAlert />
@@ -188,115 +194,40 @@ function App() {
   );
 }
 
-function Preview({ config }: { config: Config }) {
-  const inspected = [
-    ...(config.inspect?.requestHeaders.map((header) => ({ direction: 'request' as const, header })) ?? []),
-    ...(config.inspect?.responseHeaders.map((header) => ({ direction: 'response' as const, header })) ?? []),
-  ];
+/** The popup as it will look with this config. Inert, so nothing changes until the config is applied. */
+function Preview({ config, paused }: { config: Config; paused: boolean }) {
+  const request = useMemo(() => sampleRequest(config), [config]);
+  const noop = () => {};
 
   return (
-    <ItemGroup className="gap-2">
-      {inspected.length > 0 && (
-        <Item variant="outline">
-          <ItemContent>
-            <ItemTitle>
-              <Eye className="size-4" /> Shown in the popup
-            </ItemTitle>
-            <ItemDescription>Read from the current page's document request.</ItemDescription>
-          </ItemContent>
-          <ItemFooter className="flex-col items-stretch gap-1.5">
-            {inspected.map(({ direction, header }) => (
-              <div key={`${direction}-${header.name}`} className="flex min-w-0 items-center gap-2 text-xs">
-                <DirectionBadge direction={direction} />
-                <code className="truncate font-mono">{header.name}</code>
-                {header.tones && (
-                  <Badge variant="outline" className="ml-auto shrink-0" title={header.tones.map((t) => `${t.match} → ${t.tone}`).join('\n')}>
-                    {header.tones.length} {header.tones.length === 1 ? 'tone' : 'tones'}
-                  </Badge>
-                )}
-              </div>
-            ))}
-          </ItemFooter>
-        </Item>
-      )}
-      {!config.profiles.length && (
-        <Empty>
-          <EmptyHeader>
-            <EmptyTitle>No profiles</EmptyTitle>
-            <EmptyDescription>Add a profile to the JSON to see it here.</EmptyDescription>
-          </EmptyHeader>
-        </Empty>
-      )}
-      {config.profiles.map((profile, index) => (
-        <Item key={index} variant="outline" className={cn(!profile.enabled && 'opacity-60')}>
-          <ItemContent>
-            <ItemTitle>
-              {profile.name}
-              {!profile.enabled && <Badge variant="outline">Off</Badge>}
-              {profile.group !== undefined && (
-                <Badge variant="secondary">
-                  <Link2 /> {profile.group} · one at a time
-                </Badge>
-              )}
-            </ItemTitle>
-            <ItemDescription className="flex items-center gap-1.5">
-              {profile.domains ? (
-                <>
-                  <Globe className="size-3.5" /> {profile.domains.join(', ')}
-                </>
-              ) : (
-                <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-500">
-                  <TriangleAlert className="size-3.5" /> Applies to every site
-                </span>
-              )}
-            </ItemDescription>
-          </ItemContent>
-          <ItemFooter className="flex-col items-stretch gap-1.5">
-            {profile.requestHeaders.map((h, i) => (
-              <HeaderLine key={`req-${i}`} direction="request" header={h} />
-            ))}
-            {profile.responseHeaders.map((h, i) => (
-              <HeaderLine key={`res-${i}`} direction="response" header={h} />
-            ))}
-          </ItemFooter>
-        </Item>
-      ))}
-    </ItemGroup>
-  );
-}
-
-function HeaderLine({ direction, header }: { direction: 'request' | 'response'; header: Header }) {
-  const selectedLabel = header.options?.find((o) => o.value === header.value)?.label;
-
-  return (
-    <div className="flex min-w-0 items-center gap-2 text-xs">
-      <DirectionBadge direction={direction} />
-      <code className="truncate font-mono">
-        {header.operation === 'remove' ? (
-          <>
-            <span className="text-destructive">remove</span> {header.name}
-          </>
-        ) : (
-          <>
-            {header.name}: <span className="text-muted-foreground">{header.value}</span>
-          </>
-        )}
-      </code>
-      {header.options && (
-        <Badge variant="outline" className="ml-auto shrink-0">
-          {selectedLabel} · {header.options.length} options
-        </Badge>
-      )}
+    <div inert className="mx-auto w-fit overflow-hidden rounded-xl border bg-background shadow-sm">
+      <Popup
+        config={config}
+        paused={paused}
+        request={request}
+        onConfigChange={noop}
+        onPausedChange={noop}
+        onOpenOptions={noop}
+      />
     </div>
   );
 }
 
-function DirectionBadge({ direction }: { direction: 'request' | 'response' }) {
-  return (
-    <Badge variant="secondary" className="w-16 shrink-0 font-mono uppercase">
-      {direction === 'request' ? 'req' : 'res'}
-    </Badge>
-  );
+/** A made-up page load so inspected headers show, each with a value its tones would colour. */
+function sampleRequest(config: Config): DocumentRequest {
+  const sample = (header: InspectHeader) => {
+    const match = header.tones?.[0]?.match ?? 'example';
+    return { name: header.name, value: /^[1-5]xx$/i.test(match) ? `${match[0]}00` : match };
+  };
+  const domain = config.profiles.find((profile) => profile.domains)?.domains?.[0] ?? 'example.com';
+
+  return {
+    requestId: 'preview',
+    url: `https://${domain}/`,
+    statusCode: 200,
+    requestHeaders: config.inspect?.requestHeaders.map(sample) ?? [],
+    responseHeaders: config.inspect?.responseHeaders.map(sample) ?? [],
+  };
 }
 
 export default App;
