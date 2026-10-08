@@ -191,3 +191,44 @@ test('asks for a reload when the page was loaded before the extension', async ({
   await expect(section).toContainText('Headers are read when the page loads.');
   await expect(section.getByRole('button', { name: 'Reload page' })).toBeVisible();
 });
+
+test('clearing site data reloads the page as a new visitor', async ({ context, extensionUrl, echoUrl }) => {
+  await setUp(context, extensionUrl);
+  // Cookies ignore ports, so the same server on another host name stands in for a different site.
+  const otherUrl = echoUrl.replace('127.0.0.1', 'localhost');
+
+  const other = await context.newPage();
+  await other.goto(otherUrl);
+  await other.evaluate(() => (document.cookie = 'other=1'));
+
+  const site = await context.newPage();
+  await site.goto(echoUrl);
+  await site.evaluate(() => {
+    document.cookie = 'session=1';
+    localStorage.setItem('seen', '1');
+    sessionStorage.setItem('seen', '1');
+  });
+  expect(await receivedHeaders(site, echoUrl)).toMatchObject({ cookie: 'session=1' });
+
+  const worker = context.serviceWorkers()[0]!;
+  const tabId = await worker.evaluate(async (url) => (await chrome.tabs.query({ url }))[0]?.id, echoUrl);
+  const popup = await context.newPage();
+  await popup.goto(extensionUrl(`popup.html?tabId=${tabId}`));
+  await popup.getByRole('button', { name: 'Clear site data and reload' }).click();
+
+  // The reload itself goes out without the old cookie.
+  await expect.poll(async () => JSON.parse((await site.locator('body').textContent()) ?? '{}')).not.toHaveProperty('cookie');
+  expect(await site.evaluate(() => [document.cookie, localStorage.length, sessionStorage.length])).toEqual(['', 0, 0]);
+  // Other sites keep theirs.
+  expect(await receivedHeaders(other, otherUrl)).toMatchObject({ cookie: 'other=1' });
+});
+
+test('there is nothing to clear on browser pages', async ({ context, extensionUrl }) => {
+  await setUp(context, extensionUrl);
+  const worker = context.serviceWorkers()[0]!;
+  const tabId = await worker.evaluate(async () => (await chrome.tabs.query({ url: 'chrome-extension://*/options.html' }))[0]?.id);
+  const popup = await context.newPage();
+  await popup.goto(extensionUrl(`popup.html?tabId=${tabId}`));
+  await expect(popup.getByRole('button', { name: 'Settings' })).toBeVisible();
+  await expect(popup.getByRole('button', { name: 'Clear site data and reload' })).toHaveCount(0);
+});

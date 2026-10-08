@@ -37,16 +37,17 @@ Everything is driven by a JSON config that can be shared as a file. Import it fr
 | `inspect.*Headers[].tones` | – | Write a header as `{ "name": …, "tones": { "Fresh": "success", "5xx": "error" } }` to show its value as a coloured tag: `"success"`, `"warning"` or `"error"`. Values match case-insensitively; keys like `"2xx"` match status codes, and exact values win. The card's border follows the worst tone |
 | `inspect.*Headers[].badge` | – | Show one header on the toolbar icon of each tab, coloured by its tone. `true` shows ✓ for success, ⚠ for warning and ✕ for error, and untoned values as they are; an object like `{ "Failure": "!" }` shows its own text for those values instead (about 4 characters fit) |
 
-The popup's pause button turns every profile off at once without touching their switches, so resuming restores them; the toolbar badge reads `off` while paused, and otherwise shows the `badge` header of the tab's page, if one is configured. The paused state isn't part of the config, so it isn't exported. The popup can only show requests made after the extension loaded, so reload pages that were already open. Earlier profiles win when two profiles set the same header. Unknown keys are rejected so typos surface on import. `config.schema.json` (generated with `pnpm schema`) gives editors validation and autocomplete; see `examples/`.
+The popup's pause button turns every profile off at once without touching their switches, so resuming restores them; the toolbar badge reads `off` while paused, and otherwise shows the `badge` header of the tab's page, if one is configured. The paused state isn't part of the config, so it isn't exported. The reload-with-eraser button reloads the current page as a new visitor: it clears the site's cookies, local and session storage, IndexedDB, caches and service workers first. Only the page's origin is cleared, but Chrome removes cookies for the whole registrable domain, so `app.example.com` also loses `example.com` cookies (and any login with them). The popup can only show requests made after the extension loaded, so reload pages that were already open. Earlier profiles win when two profiles set the same header. Unknown keys are rejected so typos surface on import. `config.schema.json` (generated with `pnpm schema`) gives editors validation and autocomplete; see `examples/`.
 
 ## Layout
 
 - `entrypoints/background.ts` – service worker; syncs the stored config into DNR rules and records each tab's document request headers
-- `entrypoints/popup/` – profile on/off toggles, pause all, and the inspected headers of the current page
+- `entrypoints/popup/` – profile on/off toggles, pause all, clear site data, and the inspected headers of the current page
 - `entrypoints/options/` – import / edit / preview / export the JSON config
 - `lib/config.ts` – Zod schema, parsing and serialization (source of truth for the format)
 - `lib/rules.ts` – pure `config → DNR rules` mapping
 - `lib/document.ts` – captured document requests (`chrome.storage.session`, per tab) and header lookup
+- `lib/site.ts` – clearing a site's data for a fresh visit
 - `lib/settings.ts` – typed `chrome.storage` items (config and paused state)
 - `components/ui/` – shadcn/ui components (add more with `pnpm dlx shadcn@latest add <name>`)
 - `assets/tailwind.css` – Tailwind + shadcn theme; dark mode follows the OS

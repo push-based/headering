@@ -2,6 +2,7 @@ import { Popup } from '@/components/popup/Popup';
 import type { Config } from '@/lib/config';
 import { documentRequestItem, type DocumentRequest } from '@/lib/document';
 import { configItem, pausedItem } from '@/lib/settings';
+import { clearSiteData, siteOrigin } from '@/lib/site';
 
 async function inspectedTabId(): Promise<number | undefined> {
   // e2e tests open the popup as a regular tab, so they point it at the page under test.
@@ -14,6 +15,7 @@ async function inspectedTabId(): Promise<number | undefined> {
 /** The active tab's latest document request; `undefined` while loading, `null` if none was captured. */
 function useDocumentRequest() {
   const [tabId, setTabId] = useState<number>();
+  const [origin, setOrigin] = useState<string>();
   const [request, setRequest] = useState<DocumentRequest | null>();
 
   useEffect(() => {
@@ -23,9 +25,10 @@ function useDocumentRequest() {
     void inspectedTabId().then(async (tabId) => {
       if (tabId === undefined) return setRequest(null);
       const item = documentRequestItem(tabId);
-      const value = await item.getValue();
+      const [value, tab] = await Promise.all([item.getValue(), browser.tabs.get(tabId).catch(() => undefined)]);
       if (cancelled) return;
       setTabId(tabId);
+      setOrigin(siteOrigin(tab?.url));
       setRequest(value);
       unwatch = item.watch(setRequest);
     });
@@ -36,13 +39,13 @@ function useDocumentRequest() {
     };
   }, []);
 
-  return { tabId, request };
+  return { tabId, origin, request };
 }
 
 function App() {
   const [config, setConfig] = useState<Config | null>(null);
   const [paused, setPaused] = useState(false);
-  const { tabId, request } = useDocumentRequest();
+  const { tabId, origin, request } = useDocumentRequest();
 
   useEffect(() => {
     configItem.getValue().then(setConfig);
@@ -70,6 +73,8 @@ function App() {
       onPausedChange={(value) => void pausedItem.setValue(value)}
       onOpenOptions={openOptions}
       onReload={tabId === undefined ? undefined : () => void browser.tabs.reload(tabId)}
+      siteOrigin={origin}
+      onClearSiteData={tabId === undefined || !origin ? undefined : () => clearSiteData(tabId, origin)}
     />
   );
 }

@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import { FileJson, Pause, Play, Settings } from 'lucide-react';
 import icon from '@/assets/icon.svg';
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +13,7 @@ import { groupProfiles, setProfileEnabled } from '@/lib/profiles';
 import { cn } from '@/lib/utils';
 import { DocumentHeaders } from './DocumentHeaders';
 import { OptionPicker } from './OptionPicker';
+import { RotateCwEraser } from './RotateCwEraser';
 
 const HEADER_LISTS = ['requestHeaders', 'responseHeaders'] as const;
 type HeaderList = (typeof HEADER_LISTS)[number];
@@ -29,6 +30,8 @@ export function Popup({
   onPausedChange,
   onOpenOptions,
   onReload,
+  siteOrigin,
+  onClearSiteData,
 }: {
   config: Config;
   paused: boolean;
@@ -38,7 +41,21 @@ export function Popup({
   onPausedChange: (paused: boolean) => void;
   onOpenOptions: () => void;
   onReload?: () => void;
+  /** The current page's origin, named in the clear button's tooltip. */
+  siteOrigin?: string;
+  /** Clears the page's cookies and storage and reloads it; the button only shows when set. */
+  onClearSiteData?: () => Promise<void>;
 }) {
+  const [clearing, setClearing] = useState(false);
+  const clearSiteData = async () => {
+    setClearing(true);
+    try {
+      await onClearSiteData?.();
+    } finally {
+      setClearing(false);
+    }
+  };
+
   const toggle = (index: number, enabled: boolean) => onConfigChange(setProfileEnabled(config, index, enabled));
 
   const setHeaderValue = (index: number, list: HeaderList, headerIndex: number, value: string) =>
@@ -78,6 +95,24 @@ export function Popup({
           </Badge>
         )}
         <div className="ml-auto flex items-center gap-1">
+          {onClearSiteData && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={() => void clearSiteData()}
+                  disabled={clearing}
+                  aria-label="Clear site data and reload"
+                >
+                  <RotateCwEraser />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                Reload as a new visitor: clears cookies and storage for {siteOrigin ? new URL(siteOrigin).host : 'this site'}
+              </TooltipContent>
+            </Tooltip>
+          )}
           {(config.profiles.length > 0 || paused) && (
             <Tooltip>
               <TooltipTrigger asChild>
