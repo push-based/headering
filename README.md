@@ -61,8 +61,8 @@ pnpm compile    # type-check
 pnpm test       # unit tests (Vitest + WXT fake browser)
 pnpm e2e        # build, then load the extension in Chromium and check real requests (Playwright)
 pnpm schema     # regenerate config.schema.json
-pnpm build      # production build to .output/chrome-mv3
+pnpm build      # production build to dist/chrome-mv3
 pnpm zip        # package for the Chrome Web Store
 ```
 
-To load a build manually: `chrome://extensions` → Developer mode → **Load unpacked** → `.output/chrome-mv3`.
+To load a build manually: `chrome://extensions` → Developer mode → **Load unpacked** → `dist/chrome-mv3`.

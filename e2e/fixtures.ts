@@ -3,7 +3,7 @@ import type { AddressInfo } from 'node:net';
 import { resolve } from 'node:path';
 import { chromium, test as base, type BrowserContext } from '@playwright/test';
 
-const EXTENSION_PATH = resolve(import.meta.dirname, '../.output/chrome-mv3');
+const EXTENSION_PATH = resolve(import.meta.dirname, '../dist/chrome-mv3');
 
 export const test = base.extend<{
   context: BrowserContext;
