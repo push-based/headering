@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { findHeader, toneOf, worstTone } from './document';
+import { badgeOf, findHeader, toneOf, worstTone } from './document';
 
 describe('findHeader', () => {
   const headers = [
@@ -67,5 +67,47 @@ describe('worstTone', () => {
   it('ranks error over warning over success', () => {
     expect(worstTone(['success', undefined, 'error', 'warning'])).toBe('error');
     expect(worstTone([undefined])).toBeUndefined();
+  });
+});
+
+describe('badgeOf', () => {
+  const inspect = {
+    requestHeaders: ['x-ssr-skip-cache'].map((name) => ({ name })),
+    responseHeaders: [
+      { name: 'x-ssr-request-id' },
+      {
+        name: 'x-ssr-status',
+        tones: [
+          { match: 'Fresh', tone: 'success' as const },
+          { match: 'No answer', tone: 'error' as const },
+        ],
+        badge: [{ match: 'No answer', text: 'ERR' }],
+      },
+    ],
+  };
+  const request = (status?: string) => ({
+    requestId: '1',
+    url: 'https://example.com/',
+    requestHeaders: [],
+    responseHeaders: status === undefined ? undefined : [{ name: 'X-SSR-Status', value: status }],
+  });
+
+  it('shows the value with its tone', () => {
+    expect(badgeOf(inspect, request('Fresh'))).toEqual({ text: 'Fresh', tone: 'success' });
+  });
+
+  it('uses a label for a known value, matched case-insensitively', () => {
+    expect(badgeOf(inspect, request('no answer'))).toEqual({ text: 'ERR', tone: 'error' });
+  });
+
+  it('shows untoned values as they are', () => {
+    expect(badgeOf(inspect, request('Stale'))).toEqual({ text: 'Stale', tone: undefined });
+  });
+
+  it('shows nothing until the header arrives, or without a badge header', () => {
+    expect(badgeOf(inspect, request())).toBeUndefined();
+    expect(badgeOf(inspect, null)).toBeUndefined();
+    expect(badgeOf({ requestHeaders: [], responseHeaders: [{ name: 'x-ssr-status' }] }, request('Fresh'))).toBeUndefined();
+    expect(badgeOf(undefined, request('Fresh'))).toBeUndefined();
   });
 });

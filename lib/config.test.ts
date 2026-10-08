@@ -199,6 +199,41 @@ describe('parseConfig', () => {
       expect(Object.keys(json.inspect.responseHeaders[1].tones)).toEqual(['Fresh', 'Skipped', 'No answer']);
     });
 
+    it('keeps badge labels in file order, and `true` as no labels', () => {
+      const badge = { Fresh: 'OK', 'No answer': 'ERR' };
+      const result = parse({
+        version: 1,
+        inspect: { responseHeaders: [{ name: 'x-ssr-status', badge }, { name: 'x-ssr-status-code', tones: { '5xx': 'error' } }] },
+        profiles: [],
+      });
+      if (!result.ok) throw new Error('expected valid config');
+      expect(result.config.inspect?.responseHeaders[0]?.badge).toEqual([
+        { match: 'Fresh', text: 'OK' },
+        { match: 'No answer', text: 'ERR' },
+      ]);
+
+      const json = JSON.parse(serializeConfig(sortKeysDeep(result.config) as typeof result.config));
+      expect(json.inspect.responseHeaders[0]).toEqual({ name: 'x-ssr-status', badge });
+
+      const plain = parse({ version: 1, inspect: { responseHeaders: [{ name: 'x-ssr-status', badge: true }] }, profiles: [] });
+      if (!plain.ok) throw new Error('expected valid config');
+      expect(plain.config.inspect?.responseHeaders[0]).toEqual({ name: 'x-ssr-status', badge: [] });
+      expect(JSON.parse(serializeConfig(plain.config)).inspect.responseHeaders[0]).toEqual({ name: 'x-ssr-status', badge: true });
+    });
+
+    it('allows only one badge header', () => {
+      expect(
+        parse({
+          version: 1,
+          inspect: {
+            requestHeaders: [{ name: 'x-ssr-skip-cache', badge: true }],
+            responseHeaders: [{ name: 'x-ssr-status', badge: true }],
+          },
+          profiles: [],
+        }),
+      ).toEqual({ ok: false, errors: ['inspect.responseHeaders.0.badge: Only one header can be shown on the badge'] });
+    });
+
     it('rejects unknown tones and keys', () => {
       expect(
         parse({ version: 1, inspect: { responseHeaders: [{ name: 'x-ssr-status', tones: { Fresh: 'green' } }] }, profiles: [] }),

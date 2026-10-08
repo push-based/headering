@@ -42,6 +42,26 @@
                         "error"
                       ]
                     }
+                  },
+                  "badge": {
+                    "description": "Show the value on the toolbar icon, coloured by its tone. Use an object of value → short text (about 4 characters fit) to abbreviate known values.",
+                    "anyOf": [
+                      {
+                        "type": "boolean",
+                        "const": true
+                      },
+                      {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "additionalProperties": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    ]
                   }
                 },
                 "required": [
@@ -82,6 +102,26 @@
                         "error"
                       ]
                     }
+                  },
+                  "badge": {
+                    "description": "Show the value on the toolbar icon, coloured by its tone. Use an object of value → short text (about 4 characters fit) to abbreviate known values.",
+                    "anyOf": [
+                      {
+                        "type": "boolean",
+                        "const": true
+                      },
+                      {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "additionalProperties": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    ]
                   }
                 },
                 "required": [

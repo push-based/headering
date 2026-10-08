@@ -1,5 +1,5 @@
 import type { Browser } from 'wxt/browser';
-import type { Tone, ToneRule } from './config';
+import type { Inspect, Tone, ToneRule } from './config';
 
 export type HttpHeader = Browser.webRequest.HttpHeader;
 
@@ -48,4 +48,28 @@ export function worstTone(tones: (Tone | undefined)[]): Tone | undefined {
     (worst, tone) => (tone && (!worst || TONE_RANK[tone] > TONE_RANK[worst]) ? tone : worst),
     undefined,
   );
+}
+
+export interface PageBadge {
+  text: string;
+  tone?: Tone;
+}
+
+/**
+ * What the toolbar icon shows for a page: the value of the header marked as the badge,
+ * shortened by its labels and toned like in the popup. Nothing until the header arrives.
+ */
+export function badgeOf(inspect: Inspect | undefined, request: DocumentRequest | null | undefined): PageBadge | undefined {
+  const [direction, header] =
+    (['requestHeaders', 'responseHeaders'] as const)
+      .flatMap((list) => (inspect?.[list] ?? []).map((h) => [list, h] as const))
+      .find(([, h]) => h.badge) ?? [];
+  if (!direction || !header) return undefined;
+
+  const values = findHeader(request?.[direction], header.name);
+  if (!values.length) return undefined;
+  const text = values
+    .map((value) => header.badge?.find((b) => b.match.toLowerCase() === value.trim().toLowerCase())?.text ?? value)
+    .join(',');
+  return { text, tone: toneOf(header.tones, values) };
 }

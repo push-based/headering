@@ -92,7 +92,8 @@ test('pausing stops every profile until resumed', async ({ context, extensionUrl
   await expect(pause).toHaveAttribute('aria-pressed', 'false');
   await expect(popup.getByRole('banner')).not.toContainText('Paused');
   await expect.poll(() => receivedHeaders(site, echoUrl)).toMatchObject({ 'x-ssr-skip-cache': '1' });
-  await expect.poll(badgeText).toBe('1');
+  // Without a badge header there's nothing to show once resumed.
+  await expect.poll(badgeText).toBe('');
 });
 
 test('the option picker is keyboard driven', async ({ context, extensionUrl }) => {
@@ -131,7 +132,7 @@ test('shows the configured headers of the page\'s document request', async ({ co
       requestHeaders: ['x-ssr-skip-cache'],
       responseHeaders: [
         'x-ssr-request-id',
-        { name: 'x-ssr-status', tones: { hit: 'success', miss: 'warning' } },
+        { name: 'x-ssr-status', tones: { hit: 'success', miss: 'warning' }, badge: { hit: 'OK' } },
         'x-ssr-status-code',
       ],
     },
@@ -144,6 +145,14 @@ test('shows the configured headers of the page\'s document request', async ({ co
 
   const worker = context.serviceWorkers()[0]!;
   const tabId = await worker.evaluate(async (url) => (await chrome.tabs.query({ url }))[0]?.id, echoUrl);
+  // The toolbar icon shows the badge header's label, coloured by its tone.
+  const badge = () =>
+    worker.evaluate(
+      async (tabId) => [await chrome.action.getBadgeText({ tabId }), await chrome.action.getBadgeBackgroundColor({ tabId })],
+      tabId,
+    );
+  await expect.poll(badge).toEqual(['OK', [21, 128, 61, 255]]);
+
   const popup = await context.newPage();
   await popup.goto(extensionUrl(`popup.html?tabId=${tabId}`));
 
@@ -167,6 +176,7 @@ test('shows the configured headers of the page\'s document request', async ({ co
   await site.reload();
   await expect(value('x-ssr-request-id')).not.toHaveText(before ?? '');
   await expect(value('x-ssr-request-id')).toHaveText(/^req-\d+$/);
+  await expect.poll(badge).toEqual(['OK', [21, 128, 61, 255]]);
 });
 
 test('asks for a reload when the page was loaded before the extension', async ({ context, extensionUrl }) => {

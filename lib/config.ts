@@ -68,9 +68,17 @@ export interface ToneRule {
   tone: Tone;
 }
 
+export interface BadgeLabel {
+  /** An exact value, matched case-insensitively. */
+  match: string;
+  text: string;
+}
+
 export interface InspectHeader {
   name: string;
   tones?: ToneRule[];
+  /** Shows the header's value on the toolbar icon. Labels shorten known values; others show as they are. */
+  badge?: BadgeLabel[];
 }
 
 const InspectHeader = z
@@ -87,6 +95,13 @@ const InspectHeader = z
             'Value → "success", "warning" or "error", shown as a coloured tag in the popup. ' +
               'Values match case-insensitively; keys like "2xx" match status codes.',
           ),
+        badge: z
+          .union([z.literal(true), z.record(z.string().min(1), z.string().min(1))])
+          .optional()
+          .describe(
+            'Show the value on the toolbar icon, coloured by its tone. Use an object of value → short text ' +
+              '(about 4 characters fit) to abbreviate known values.',
+          ),
       })
       .superRefine((h, ctx) => {
         for (const [match, tone] of Object.entries(h.tones ?? {})) {
@@ -99,14 +114,26 @@ const InspectHeader = z
   // chrome.storage sorts object keys, so keep tones as an ordered list internally.
   .transform((h): InspectHeader => {
     if (typeof h === 'string') return { name: h };
-    if (!h.tones) return { name: h.name };
-    return { name: h.name, tones: Object.entries(h.tones).map(([match, tone]) => ({ match, tone: tone as Tone })) };
+    return {
+      name: h.name,
+      ...(h.tones && { tones: Object.entries(h.tones).map(([match, tone]) => ({ match, tone: tone as Tone })) }),
+      // `true` is kept as an empty list: no labels, so values show as they are.
+      ...(h.badge && { badge: h.badge === true ? [] : Object.entries(h.badge).map(([match, text]) => ({ match, text })) }),
+    };
   });
 
 const Inspect = z
   .strictObject({
     requestHeaders: z.array(InspectHeader).default([]),
     responseHeaders: z.array(InspectHeader).default([]),
+  })
+  .superRefine((inspect, ctx) => {
+    const badges = (['requestHeaders', 'responseHeaders'] as const).flatMap((list) =>
+      inspect[list].flatMap((h, index) => (h.badge ? [[list, index] as const] : [])),
+    );
+    for (const [list, index] of badges.slice(1)) {
+      ctx.addIssue({ code: 'custom', message: 'Only one header can be shown on the badge', path: [list, index, 'badge'] });
+    }
   })
   .describe("Headers of the current page's document request to show in the popup.");
 
@@ -198,8 +225,14 @@ function headerToJson(header: Header) {
   };
 }
 
-/** Plain names stay plain; only headers with tones need the object form. */
+/** Plain names stay plain; only headers with tones or a badge need the object form. */
 function inspectHeaderToJson(header: InspectHeader) {
-  if (!header.tones) return header.name;
-  return { name: header.name, tones: Object.fromEntries(header.tones.map((t) => [t.match, t.tone])) };
+  if (!header.tones && !header.badge) return header.name;
+  return {
+    name: header.name,
+    ...(header.tones && { tones: Object.fromEntries(header.tones.map((t) => [t.match, t.tone])) }),
+    ...(header.badge && {
+      badge: header.badge.length ? Object.fromEntries(header.badge.map((b) => [b.match, b.text])) : true,
+    }),
+  };
 }
