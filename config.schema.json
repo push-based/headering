@@ -44,7 +44,7 @@
                     }
                   },
                   "badge": {
-                    "description": "Show the value on the toolbar icon, coloured by its tone. Use an object of value → short text (about 4 characters fit) to abbreviate known values.",
+                    "description": "Show the value on the toolbar icon, coloured by its tone: ✓ for success, ⚠ for warning, ✕ for error, and the value itself without a tone. Use an object of value → short text (about 4 characters fit) to show something else for known values.",
                     "anyOf": [
                       {
                         "type": "boolean",
@@ -104,7 +104,7 @@
                     }
                   },
                   "badge": {
-                    "description": "Show the value on the toolbar icon, coloured by its tone. Use an object of value → short text (about 4 characters fit) to abbreviate known values.",
+                    "description": "Show the value on the toolbar icon, coloured by its tone: ✓ for success, ⚠ for warning, ✕ for error, and the value itself without a tone. Use an object of value → short text (about 4 characters fit) to show something else for known values.",
                     "anyOf": [
                       {
                         "type": "boolean",

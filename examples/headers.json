@@ -6,8 +6,8 @@
       "x-ssr-request-id",
       {
         "name": "x-ssr-status",
-        "tones": { "Fresh": "success", "Skipped": "warning", "No answer": "error" },
-        "badge": { "Fresh": "FRSH", "Skipped": "SKIP", "No answer": "NA" }
+        "tones": { "Fresh": "success", "Skipped": "warning", "Failure": "error", "No answer": "error" },
+        "badge": { "Failure": "!" }
       },
       {
         "name": "x-ssr-status-code",

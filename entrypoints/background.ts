@@ -5,8 +5,13 @@ import { configItem, pausedItem } from '@/lib/settings';
 
 const BADGE_COLOR = '#4F46E5';
 const PAUSED_BADGE_COLOR = '#737373';
-// Same hues as the popup's tone tags.
-const TONE_BADGE_COLOR: Record<Tone, string> = { success: '#15803D', warning: '#C2410C', error: '#DC2626' };
+const BADGE_TEXT_COLOR = '#FFFFFF';
+// Same hues as the popup's tone tags. White doesn't read on yellow, so warning gets dark text.
+const TONE_BADGE_COLOR: Record<Tone, { background: string; text: string }> = {
+  success: { background: '#15803D', text: BADGE_TEXT_COLOR },
+  warning: { background: '#FACC15', text: '#422006' },
+  error: { background: '#DC2626', text: BADGE_TEXT_COLOR },
+};
 
 async function applyConfig() {
   const [config, paused] = await Promise.all([configItem.getValue(), pausedItem.getValue()]);
@@ -30,11 +35,14 @@ async function showBadge(tabId: number, request?: DocumentRequest | null) {
   // A tab's own text overrides the global one, so it has to say `off` too.
   if (paused) {
     await browser.action.setBadgeBackgroundColor({ tabId, color: PAUSED_BADGE_COLOR });
+    await browser.action.setBadgeTextColor({ tabId, color: BADGE_TEXT_COLOR });
     await browser.action.setBadgeText({ tabId, text: 'off' });
     return;
   }
   const badge = badgeOf(config.inspect, request === undefined ? await documentRequestItem(tabId).getValue() : request);
-  await browser.action.setBadgeBackgroundColor({ tabId, color: badge?.tone ? TONE_BADGE_COLOR[badge.tone] : BADGE_COLOR });
+  const color = badge?.tone ? TONE_BADGE_COLOR[badge.tone] : { background: BADGE_COLOR, text: BADGE_TEXT_COLOR };
+  await browser.action.setBadgeBackgroundColor({ tabId, color: color.background });
+  await browser.action.setBadgeTextColor({ tabId, color: color.text });
   await browser.action.setBadgeText({ tabId, text: badge?.text ?? '' });
 }
 

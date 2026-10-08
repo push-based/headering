@@ -7,14 +7,14 @@ import { cn } from '@/lib/utils';
 
 const TONE_TAG: Record<Tone, string> = {
   success: 'bg-green-100 text-green-800 dark:bg-green-500/15 dark:text-green-400',
-  warning: 'bg-orange-100 text-orange-800 dark:bg-orange-500/15 dark:text-orange-300',
+  warning: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-500/15 dark:text-yellow-300',
   error: 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300',
 };
 
 // The card's edge follows the worst tone so a problem shows before any row is read.
 const TONE_BORDER: Record<Tone, string> = {
   success: '',
-  warning: 'border-orange-300 dark:border-orange-500/45',
+  warning: 'border-yellow-400 dark:border-yellow-500/45',
   error: 'border-red-300 dark:border-red-500/50',
 };
 

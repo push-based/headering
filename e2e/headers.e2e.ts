@@ -132,7 +132,7 @@ test('shows the configured headers of the page\'s document request', async ({ co
       requestHeaders: ['x-ssr-skip-cache'],
       responseHeaders: [
         'x-ssr-request-id',
-        { name: 'x-ssr-status', tones: { hit: 'success', miss: 'warning' }, badge: { hit: 'OK' } },
+        { name: 'x-ssr-status', tones: { hit: 'warning' }, badge: true },
         'x-ssr-status-code',
       ],
     },
@@ -145,13 +145,17 @@ test('shows the configured headers of the page\'s document request', async ({ co
 
   const worker = context.serviceWorkers()[0]!;
   const tabId = await worker.evaluate(async (url) => (await chrome.tabs.query({ url }))[0]?.id, echoUrl);
-  // The toolbar icon shows the badge header's label, coloured by its tone.
+  // The toolbar icon shows the badge header's tone as a symbol.
   const badge = () =>
     worker.evaluate(
-      async (tabId) => [await chrome.action.getBadgeText({ tabId }), await chrome.action.getBadgeBackgroundColor({ tabId })],
+      async (tabId) => [
+        await chrome.action.getBadgeText({ tabId }),
+        await chrome.action.getBadgeBackgroundColor({ tabId }),
+        await chrome.action.getBadgeTextColor({ tabId }),
+      ],
       tabId,
     );
-  await expect.poll(badge).toEqual(['OK', [21, 128, 61, 255]]);
+  await expect.poll(badge).toEqual(['⚠\uFE0E', [250, 204, 21, 255], [66, 32, 6, 255]]);
 
   const popup = await context.newPage();
   await popup.goto(extensionUrl(`popup.html?tabId=${tabId}`));
@@ -167,7 +171,7 @@ test('shows the configured headers of the page\'s document request', async ({ co
   await expect(value('x-ssr-skip-cache')).toHaveText('1');
   await expect(value('x-ssr-status')).toHaveText('HIT');
   // Tones match case-insensitively.
-  await expect(value('x-ssr-status')).toHaveAttribute('data-tone', 'success');
+  await expect(value('x-ssr-status')).toHaveAttribute('data-tone', 'warning');
   await expect(value('x-ssr-request-id')).not.toHaveAttribute('data-tone');
   await expect(value('x-ssr-status-code')).toHaveText('not set');
 
@@ -176,7 +180,7 @@ test('shows the configured headers of the page\'s document request', async ({ co
   await site.reload();
   await expect(value('x-ssr-request-id')).not.toHaveText(before ?? '');
   await expect(value('x-ssr-request-id')).toHaveText(/^req-\d+$/);
-  await expect.poll(badge).toEqual(['OK', [21, 128, 61, 255]]);
+  await expect.poll(badge).toEqual(['⚠\uFE0E', [250, 204, 21, 255], [66, 32, 6, 255]]);
 });
 
 test('asks for a reload when the page was loaded before the extension', async ({ context, extensionUrl }) => {

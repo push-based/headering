@@ -77,7 +77,7 @@ export interface BadgeLabel {
 export interface InspectHeader {
   name: string;
   tones?: ToneRule[];
-  /** Shows the header's value on the toolbar icon. Labels shorten known values; others show as they are. */
+  /** Shows the header on the toolbar icon: a value's label, else its tone's symbol, else the value. */
   badge?: BadgeLabel[];
 }
 
@@ -99,8 +99,9 @@ const InspectHeader = z
           .union([z.literal(true), z.record(z.string().min(1), z.string().min(1))])
           .optional()
           .describe(
-            'Show the value on the toolbar icon, coloured by its tone. Use an object of value → short text ' +
-              '(about 4 characters fit) to abbreviate known values.',
+            'Show the value on the toolbar icon, coloured by its tone: ✓ for success, ⚠ for warning, ✕ for error, ' +
+              'and the value itself without a tone. Use an object of value → short text (about 4 characters fit) ' +
+              'to show something else for known values.',
           ),
       })
       .superRefine((h, ctx) => {
@@ -117,7 +118,7 @@ const InspectHeader = z
     return {
       name: h.name,
       ...(h.tones && { tones: Object.entries(h.tones).map(([match, tone]) => ({ match, tone: tone as Tone })) }),
-      // `true` is kept as an empty list: no labels, so values show as they are.
+      // `true` is kept as an empty list: no labels, so values show their tone's symbol.
       ...(h.badge && { badge: h.badge === true ? [] : Object.entries(h.badge).map(([match, text]) => ({ match, text })) }),
     };
   });

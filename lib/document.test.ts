@@ -79,9 +79,11 @@ describe('badgeOf', () => {
         name: 'x-ssr-status',
         tones: [
           { match: 'Fresh', tone: 'success' as const },
+          { match: 'Skipped', tone: 'warning' as const },
+          { match: 'Failure', tone: 'error' as const },
           { match: 'No answer', tone: 'error' as const },
         ],
-        badge: [{ match: 'No answer', text: 'ERR' }],
+        badge: [{ match: 'Failure', text: '!' }],
       },
     ],
   };
@@ -92,12 +94,14 @@ describe('badgeOf', () => {
     responseHeaders: status === undefined ? undefined : [{ name: 'X-SSR-Status', value: status }],
   });
 
-  it('shows the value with its tone', () => {
-    expect(badgeOf(inspect, request('Fresh'))).toEqual({ text: 'Fresh', tone: 'success' });
+  it("shows its tone's symbol", () => {
+    expect(badgeOf(inspect, request('Fresh'))).toEqual({ text: '✓', tone: 'success' });
+    expect(badgeOf(inspect, request('Skipped'))).toEqual({ text: '⚠\uFE0E', tone: 'warning' });
+    expect(badgeOf(inspect, request('No answer'))).toEqual({ text: '✕', tone: 'error' });
   });
 
-  it('uses a label for a known value, matched case-insensitively', () => {
-    expect(badgeOf(inspect, request('no answer'))).toEqual({ text: 'ERR', tone: 'error' });
+  it("prefers a value's label, matched case-insensitively", () => {
+    expect(badgeOf(inspect, request('failure'))).toEqual({ text: '!', tone: 'error' });
   });
 
   it('shows untoned values as they are', () => {

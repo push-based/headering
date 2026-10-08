@@ -55,9 +55,12 @@ export interface PageBadge {
   tone?: Tone;
 }
 
+// The text variation selector keeps ⚠ from turning into a colour emoji.
+const TONE_SYMBOL: Record<Tone, string> = { success: '✓', warning: '⚠\uFE0E', error: '✕' };
+
 /**
- * What the toolbar icon shows for a page: the value of the header marked as the badge,
- * shortened by its labels and toned like in the popup. Nothing until the header arrives.
+ * What the toolbar icon shows for a page: for the header marked as the badge, a value's
+ * label, else its tone's symbol, else the value itself. Nothing until the header arrives.
  */
 export function badgeOf(inspect: Inspect | undefined, request: DocumentRequest | null | undefined): PageBadge | undefined {
   const [direction, header] =
@@ -69,7 +72,11 @@ export function badgeOf(inspect: Inspect | undefined, request: DocumentRequest |
   const values = findHeader(request?.[direction], header.name);
   if (!values.length) return undefined;
   const text = values
-    .map((value) => header.badge?.find((b) => b.match.toLowerCase() === value.trim().toLowerCase())?.text ?? value)
+    .map((value) => {
+      const label = header.badge?.find((b) => b.match.toLowerCase() === value.trim().toLowerCase());
+      const tone = toneOf(header.tones, [value]);
+      return label?.text ?? (tone ? TONE_SYMBOL[tone] : value);
+    })
     .join(',');
   return { text, tone: toneOf(header.tones, values) };
 }
