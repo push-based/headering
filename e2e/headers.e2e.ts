@@ -51,7 +51,7 @@ test('imports a config and applies toggled headers', async ({ context, extension
 
 test('grouped profiles are mutually exclusive', async ({ context, extensionUrl, echoUrl }) => {
   const popup = await setUp(context, extensionUrl);
-  const group = popup.getByRole('group', { name: 'SSR mode, one at a time' });
+  const group = popup.getByRole('group', { name: 'SSR Skip Condition, one at a time' });
   const ssrEnabled = group.getByRole('switch', { name: 'SSR Enabled' });
   const ssrDisabled = group.getByRole('switch', { name: 'SSR Disabled' });
 
