@@ -39,8 +39,6 @@ export function Popup({
   onOpenOptions: () => void;
   onReload?: () => void;
 }) {
-  const activeCount = config.profiles.filter((p) => p.enabled).length;
-
   const toggle = (index: number, enabled: boolean) => onConfigChange(setProfileEnabled(config, index, enabled));
 
   const setHeaderValue = (index: number, list: HeaderList, headerIndex: number, value: string) =>
@@ -71,15 +69,13 @@ export function Popup({
       <header className="flex items-center gap-2 border-b px-4 py-3">
         <img src={icon} alt="" className="size-5" />
         <h1 className="font-heading text-base font-semibold">Headering</h1>
-        {paused ? (
+        {paused && (
           <Badge
             variant="outline"
             className="border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-300"
           >
             Paused
           </Badge>
-        ) : (
-          activeCount > 0 && <Badge>{activeCount} active</Badge>
         )}
         <div className="ml-auto flex items-center gap-1">
           {(config.profiles.length > 0 || paused) && (
