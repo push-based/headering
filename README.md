@@ -170,3 +170,11 @@ The extension is built with [WXT](https://wxt.dev), React, TypeScript, Tailwind 
 | `e2e/` | Playwright tests against the built extension. |
 
 If you change the config format in `lib/config.ts`, run `pnpm schema` and commit the updated `config.schema.json`.
+
+## Contributing
+
+Bug reports, ideas and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) to get started.
+
+## License
+
+[MIT](LICENSE)

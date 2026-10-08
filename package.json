@@ -2,6 +2,7 @@
   "name": "headering",
   "description": "Modify HTTP request headers.",
   "private": true,
+  "license": "MIT",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
