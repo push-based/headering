@@ -23,7 +23,9 @@
     "dist",
     ".wxt",
     "config.schema.json",
-    "components/ui"
+    "components/ui",
+    ".claude",
+    ".impeccable"
   ],
   "rules": {
     "react/react-in-jsx-scope": "off",

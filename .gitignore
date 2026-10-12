@@ -28,3 +28,15 @@ web-ext.config.ts
 # Playwright
 /test-results/
 /playwright-report/
+
+# Impeccable: platform binary is fetched (checksum-verified) on demand; hooks and local config are per-user
+.claude/skills/impeccable/scripts/bin/
+.claude/settings.local.json
+.impeccable/config.local.json
+# Internal push-based design guide copy; not for the public repo
+.impeccable/design-guide.md
+# Impeccable session working files (decision rounds, review captures, hook cache)
+.impeccable/hook.cache.json
+.impeccable/questions/
+.impeccable/review/
+.impeccable/mocks/
