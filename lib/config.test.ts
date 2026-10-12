@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseConfig, serializeConfig } from './config';
+import { errorLine, parseConfig, serializeConfig } from './config';
 
 const parse = (value: unknown) => parseConfig(JSON.stringify(value));
 
@@ -274,5 +274,22 @@ describe('parseConfig', () => {
     const first = parse({ version: 1, profiles: [{ name: 'P', domains: ['example.com'] }] });
     if (!first.ok) throw new Error('expected valid config');
     expect(parseConfig(serializeConfig(first.config))).toEqual(first);
+  });
+});
+
+describe('errorLine', () => {
+  it('finds the line a JSON syntax error points at', () => {
+    const text = '{\n  "version": 1\n  "profiles": []\n}';
+    const result = parseConfig(text);
+    expect(result.ok).toBe(false);
+    expect(errorLine(result.ok ? [] : result.errors, text)).toBe(3);
+  });
+
+  it('works from a position when the message has no line', () => {
+    expect(errorLine(['Invalid JSON: Unexpected token in JSON at position 5'], 'ab\ncd\nef')).toBe(2);
+  });
+
+  it('has no line for schema errors', () => {
+    expect(errorLine(['profiles.0.name: Required'], '{}')).toBeUndefined();
   });
 });

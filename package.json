@@ -24,10 +24,10 @@
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.3.0",
+    "@fontsource-variable/geist-mono": "^5.3.0",
     "class-variance-authority": "^0.7.1",
     "cmdk": "^1.1.1",
     "cn": "^0.4.0",
-    "lucide-react": "^1.52.0",
     "radix-ui": "^1.7.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
@@ -36,7 +36,10 @@
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.3",
+    "@iconify-json/solar": "^1.2.13",
     "@playwright/test": "^1.63.0",
+    "@svgr/core": "^8.1.0",
+    "@svgr/plugin-jsx": "^8.1.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
@@ -47,6 +50,7 @@
     "shadcn": "^4.21.3",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3",
+    "unplugin-icons": "^24.0.0",
     "vitest": "^5.0.3",
     "web-ext": "^10.5.0",
     "wxt": "^0.21.3"

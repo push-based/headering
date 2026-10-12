@@ -4,13 +4,14 @@ import { buildRules } from '@/lib/rules';
 import { configItem, pausedItem } from '@/lib/settings';
 import { handleClearSiteData } from '@/lib/site';
 
-const BADGE_COLOR = '#4F46E5';
-const PAUSED_BADGE_COLOR = '#737373';
+// Colours from the push-based design guide: primary-600, neutral-500 and the semantic scales.
+const BADGE_COLOR = '#7839EE';
+const PAUSED_BADGE_COLOR = '#697586';
 const BADGE_TEXT_COLOR = '#FFFFFF';
 // Same hues as the popup's tone tags. White doesn't read on yellow, so warning gets dark text.
 const TONE_BADGE_COLOR: Record<Tone, { background: string; text: string }> = {
   success: { background: '#15803D', text: BADGE_TEXT_COLOR },
-  warning: { background: '#FACC15', text: '#422006' },
+  warning: { background: '#FBBF24', text: '#451A03' },
   error: { background: '#DC2626', text: BADGE_TEXT_COLOR },
 };
 

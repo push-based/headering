@@ -1,0 +1,439 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-12T00:00:00Z",
+  "title": "Design System: Headering",
+  "extensions": {
+    "colorMeta": {
+      "sending-purple": {
+        "role": "primary",
+        "displayName": "Sending Purple",
+        "canonical": "#7839EE",
+        "tonalRamp": [
+          "#2E125E",
+          "#491C96",
+          "#5720B7",
+          "#6927DA",
+          "#7839EE",
+          "#A48AFB",
+          "#DDD6FE",
+          "#F5F3FF"
+        ]
+      },
+      "sending-purple-dark": {
+        "role": "primary",
+        "displayName": "Sending Purple (dark mode)",
+        "canonical": "#A48AFB",
+        "tonalRamp": [
+          "#2E125E",
+          "#491C96",
+          "#5720B7",
+          "#6927DA",
+          "#7839EE",
+          "#A48AFB",
+          "#DDD6FE",
+          "#F5F3FF"
+        ]
+      },
+      "purple-wash": {
+        "role": "primary",
+        "displayName": "Purple Wash",
+        "canonical": "#F5F3FF"
+      },
+      "purple-ink": {
+        "role": "primary",
+        "displayName": "Purple Ink",
+        "canonical": "#5720B7"
+      },
+      "purple-selection": {
+        "role": "primary",
+        "displayName": "Purple Selection",
+        "canonical": "#DDD6FE"
+      },
+      "purple-selection-ink": {
+        "role": "primary",
+        "displayName": "Purple Selection Ink",
+        "canonical": "#2E125E"
+      },
+      "slate-ground": {
+        "role": "neutral",
+        "displayName": "Slate Ground",
+        "canonical": "#F8FAFC",
+        "tonalRamp": [
+          "#0D121C",
+          "#202939",
+          "#364152",
+          "#4B5565",
+          "#697586",
+          "#9AA4B2",
+          "#E3E8EF",
+          "#F8FAFC"
+        ]
+      },
+      "paper-white": {
+        "role": "neutral",
+        "displayName": "Paper White",
+        "canonical": "#FFFFFF"
+      },
+      "slate-ink": {
+        "role": "neutral",
+        "displayName": "Slate Ink",
+        "canonical": "#121926"
+      },
+      "slate-quiet": {
+        "role": "neutral",
+        "displayName": "Slate Quiet",
+        "canonical": "#697586"
+      },
+      "slate-hairline": {
+        "role": "neutral",
+        "displayName": "Slate Hairline",
+        "canonical": "#E3E8EF"
+      },
+      "slate-input": {
+        "role": "neutral",
+        "displayName": "Slate Input",
+        "canonical": "#CDD5DF"
+      },
+      "slate-held": {
+        "role": "neutral",
+        "displayName": "Slate Held",
+        "canonical": "#9AA4B2"
+      },
+      "slate-wash": {
+        "role": "neutral",
+        "displayName": "Slate Wash",
+        "canonical": "#EEF2F6"
+      },
+      "night-ground": {
+        "role": "neutral",
+        "displayName": "Night Ground",
+        "canonical": "#0D121C"
+      },
+      "night-surface": {
+        "role": "neutral",
+        "displayName": "Night Surface",
+        "canonical": "#121926"
+      },
+      "night-hairline": {
+        "role": "neutral",
+        "displayName": "Night Hairline",
+        "canonical": "#202939"
+      },
+      "night-held": {
+        "role": "neutral",
+        "displayName": "Night Held",
+        "canonical": "#4B5565"
+      },
+      "night-ink": {
+        "role": "neutral",
+        "displayName": "Night Ink",
+        "canonical": "#F8FAFC"
+      },
+      "success": {
+        "role": "tertiary",
+        "displayName": "Success",
+        "canonical": "#16A34A",
+        "tonalRamp": [
+          "#052E16",
+          "#14532D",
+          "#166534",
+          "#15803D",
+          "#16A34A",
+          "#4ADE80",
+          "#BBF7D0",
+          "#F0FDF4"
+        ]
+      },
+      "success-tag": {
+        "role": "tertiary",
+        "displayName": "Success Tag",
+        "canonical": "#DCFCE7"
+      },
+      "success-tag-ink": {
+        "role": "tertiary",
+        "displayName": "Success Tag Ink",
+        "canonical": "#166534"
+      },
+      "warning": {
+        "role": "tertiary",
+        "displayName": "Warning",
+        "canonical": "#F59E0B",
+        "tonalRamp": [
+          "#451A03",
+          "#78350F",
+          "#92400E",
+          "#B45309",
+          "#D97706",
+          "#F59E0B",
+          "#FDE68A",
+          "#FFFBEB"
+        ]
+      },
+      "warning-tag": {
+        "role": "tertiary",
+        "displayName": "Warning Tag",
+        "canonical": "#FEF3C7"
+      },
+      "warning-tag-ink": {
+        "role": "tertiary",
+        "displayName": "Warning Tag Ink",
+        "canonical": "#92400E"
+      },
+      "error": {
+        "role": "tertiary",
+        "displayName": "Error",
+        "canonical": "#DC2626",
+        "tonalRamp": [
+          "#450A0A",
+          "#7F1D1D",
+          "#991B1B",
+          "#B91C1C",
+          "#DC2626",
+          "#F87171",
+          "#FECACA",
+          "#FEF2F2"
+        ]
+      },
+      "error-tag": {
+        "role": "tertiary",
+        "displayName": "Error Tag",
+        "canonical": "#FEE2E2"
+      },
+      "error-tag-ink": {
+        "role": "tertiary",
+        "displayName": "Error Tag Ink",
+        "canonical": "#991B1B"
+      },
+      "success-dark": {
+        "role": "tertiary",
+        "displayName": "Success (dark mode)",
+        "canonical": "#4ADE80"
+      },
+      "warning-dark": {
+        "role": "tertiary",
+        "displayName": "Warning (dark mode)",
+        "canonical": "#FBBF24"
+      },
+      "error-dark": {
+        "role": "tertiary",
+        "displayName": "Error (dark mode)",
+        "canonical": "#F87171"
+      }
+    },
+    "typographyMeta": {
+      "page-title": {
+        "displayName": "Page title",
+        "purpose": "\"Headering\" on the options page."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "The popup's name in its 48px header and empty-state headings."
+      },
+      "section-title": {
+        "displayName": "Section title",
+        "purpose": "Options page section headings, in Geist Mono."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Profile names and the request host."
+      },
+      "body-quiet": {
+        "displayName": "Body quiet",
+        "purpose": "Descriptions and status lines in Slate Quiet."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Group names, tone tags, the Paused tag, domain lists."
+      },
+      "header-line": {
+        "displayName": "Header line",
+        "purpose": "Header names and values, inspected rows, the request path, the JSON editor; tabular, slashed-zero numerals."
+      },
+      "status-code": {
+        "displayName": "Status code",
+        "purpose": "The response's status chip."
+      }
+    },
+    "shadows": [
+      {
+        "name": "floating",
+        "value": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+        "purpose": "Popovers, with a 10% ink ring; the primitive library's medium shadow."
+      },
+      {
+        "name": "preview-frame",
+        "value": "0 4px 16px -4px rgb(13 18 28 / 0.12)",
+        "purpose": "Only the options page's popup preview frame."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-step",
+        "value": "color 90ms steps(2)",
+        "purpose": "Every sending colour change in a profile row: header lines, the preset's header name, value and trigger border."
+      },
+      {
+        "name": "reveal",
+        "value": "opacity 150ms",
+        "purpose": "The copy button revealed on row hover or focus."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Response Band",
+      "kind": "custom",
+      "refersTo": "response-band",
+      "description": "Leads the popup: worst-tone dot, neutral status chip, host and path, then 32px inspected rows with a 124px mono name column.",
+      "html": "<section class=\"ds-resp\"><div class=\"ds-resp-head\"><span class=\"ds-resp-dot\"></span><span class=\"ds-resp-status\">200</span><span class=\"ds-resp-url\"><span class=\"ds-resp-host\">staging.example.com</span><span class=\"ds-resp-path\">/checkout</span></span></div><dl class=\"ds-resp-rows\"><div class=\"ds-resp-row\"><dt><span class=\"ds-quiet\">x-ssr-</span>cache</dt><dd><span class=\"ds-resp-tag ds-tone-warning\"><span class=\"ds-tag-dot\"></span>MISS</span></dd></div><div class=\"ds-resp-row\"><dt><span class=\"ds-quiet\">x-ssr-</span>render</dt><dd><span class=\"ds-resp-tag ds-tone-success\"><span class=\"ds-tag-dot\"></span>ok</span></dd></div><div class=\"ds-resp-row\"><dt><span class=\"ds-quiet\">x-ssr-</span>request-id</dt><dd>9f3c2a71b0e4…5d21a</dd></div></dl></section>",
+      "css": ".ds-resp { width: 360px; padding-bottom: 8px; border-bottom: 1px solid var(--border); background: var(--card); color: var(--card-foreground); font-family: var(--font-sans); } .ds-resp-head { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 12px 16px 4px; } .ds-resp-dot { width: 8px; height: 8px; flex-shrink: 0; border-radius: 9999px; background: var(--warning); } .ds-resp-status { display: inline-flex; align-items: center; height: 20px; padding: 0 6px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--background); font-family: var(--font-mono); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums slashed-zero; } .ds-resp-url { display: flex; flex: 1; min-width: 0; white-space: nowrap; font-size: 14px; line-height: 20px; } .ds-resp-host { font-weight: 500; overflow: hidden; text-overflow: ellipsis; } .ds-resp-path { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-mono); font-size: 12px; color: var(--muted-foreground); } .ds-resp-rows { display: flex; flex-direction: column; margin: 0; padding: 0 8px; } .ds-resp-row { display: flex; align-items: center; gap: 8px; height: 32px; padding-left: 8px; border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums slashed-zero; } .ds-resp-row:hover { background: color-mix(in srgb, var(--muted) 60%, transparent); } .ds-resp-row dt { width: 124px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-resp-row dd { display: flex; flex: 1; min-width: 0; margin: 0; } .ds-quiet { color: var(--muted-foreground); } .ds-resp-tag { display: inline-flex; align-items: center; gap: 6px; height: 20px; padding: 0 6px; border-radius: var(--radius-md); font-weight: 500; } .ds-tag-dot { width: 6px; height: 6px; border-radius: 9999px; background: currentColor; } .ds-tone-success { background: var(--success-tag); color: var(--success-tag-foreground); } .ds-tone-warning { background: var(--warning-tag); color: var(--warning-tag-foreground); }"
+    },
+    {
+      "name": "Profile List",
+      "kind": "custom",
+      "refersTo": "profile-row",
+      "description": "The profile list straight after the response band, with no heading: full-width rows with switches on the right, and a mutually exclusive group in one bordered block inset 8px whose text and switches keep the ungrouped column and edge; purple header lines only while sending.",
+      "html": "<section class=\"ds-out\"><div class=\"ds-row\"><div class=\"ds-row-head\"><div class=\"ds-row-name\">SSR Skip Cache<p>staging.example.com</p></div><span class=\"ds-switch ds-switch-on\"><span></span></span></div><code class=\"ds-line ds-sending\">+ x-ssr-skip-cache: 1</code></div><div class=\"ds-group\" role=\"group\"><div class=\"ds-group-head\"><span>Country</span><span class=\"ds-quiet\">One at a time</span></div><div class=\"ds-row ds-row-grouped\"><div class=\"ds-row-head\"><div class=\"ds-row-name\">Brazil</div><span class=\"ds-switch\"><span></span></span></div><code class=\"ds-line\">+ cf-ipcountry: BR</code></div><div class=\"ds-row ds-row-grouped\"><div class=\"ds-row-head\"><div class=\"ds-row-name\">Germany</div><span class=\"ds-switch\"><span></span></span></div><code class=\"ds-line\">+ cf-ipcountry: DE</code></div></div></section>",
+      "css": ".ds-out { width: 360px; padding: 8px 0; background: var(--background); color: var(--foreground); font-family: var(--font-sans); } .ds-row { padding: 8px 16px; } .ds-row:hover { background: color-mix(in srgb, var(--muted) 40%, transparent); } .ds-row-grouped { padding: 8px 7px; border-top: 1px solid var(--border); } .ds-row-head { display: flex; align-items: flex-start; gap: 12px; } .ds-row-name { flex: 1; min-width: 0; font-size: 14px; line-height: 20px; font-weight: 500; } .ds-row-name p { margin: 0; font-size: 12px; font-weight: 400; color: var(--muted-foreground); } .ds-line { display: block; margin-top: 4px; font-family: var(--font-mono); font-size: 12px; line-height: 20px; font-variant-numeric: tabular-nums slashed-zero; color: var(--muted-foreground); transition: color 90ms steps(2); } .ds-sending { color: var(--sending); } .ds-group { margin: 4px 8px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg); } .ds-group-head { display: flex; align-items: baseline; gap: 8px; padding: 6px 7px; background: color-mix(in srgb, var(--muted) 40%, transparent); font-size: 12px; font-weight: 500; } .ds-quiet { color: var(--muted-foreground); font-weight: 400; } .ds-switch { display: inline-flex; align-items: center; flex-shrink: 0; width: 32px; height: 18.4px; margin-top: 1px; border-radius: 9999px; background: var(--input); } .ds-switch span { width: 16px; height: 16px; margin-left: 1px; border-radius: 9999px; background: #fff; } .ds-switch-on { background: var(--primary); } .ds-switch-on span { margin-left: 15px; }"
+    },
+    {
+      "name": "Paused Profile",
+      "kind": "custom",
+      "refersTo": "switch-held",
+      "description": "Paused: the neutral Paused tag in the header, header lines in Slate Quiet, checked switches in Slate Held; no sending purple remains.",
+      "html": "<div class=\"ds-paused\"><div class=\"ds-paused-bar\"><span class=\"ds-paused-title\">Headering</span><span class=\"ds-paused-tag\">Paused</span></div><div class=\"ds-paused-row\"><div class=\"ds-paused-name\"><span>SSR Skip Cache</span><span class=\"ds-paused-switch\"><span></span></span></div><code>+ x-ssr-skip-cache: 1</code></div></div>",
+      "css": ".ds-paused { width: 360px; background: var(--background); color: var(--foreground); font-family: var(--font-sans); } .ds-paused-bar { display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 16px; border-bottom: 1px solid var(--border); } .ds-paused-title { font-size: 14px; font-weight: 600; } .ds-paused-tag { display: inline-flex; align-items: center; height: 20px; padding: 0 6px; border-radius: var(--radius-md); background: var(--muted); color: var(--foreground); font-size: 12px; font-weight: 500; } .ds-paused-row { padding: 8px 16px; } .ds-paused-name { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; line-height: 20px; font-weight: 500; } .ds-paused-row code { display: block; margin-top: 4px; font-family: var(--font-mono); font-size: 12px; line-height: 20px; color: var(--muted-foreground); } .ds-paused-switch { display: inline-flex; align-items: center; width: 32px; height: 18.4px; border-radius: 9999px; background: var(--held); } .ds-paused-switch span { width: 16px; height: 16px; margin-left: 15px; border-radius: 9999px; background: #fff; }"
+    },
+    {
+      "name": "Tone Tags",
+      "kind": "chip",
+      "refersTo": "tag-success",
+      "description": "Inspected response values that matched a tone: text plus a current-colour dot on a tone-tag fill.",
+      "html": "<span class=\"ds-tag ds-tag-success\"><span class=\"ds-tag-dot\"></span>200</span> <span class=\"ds-tag ds-tag-warning\"><span class=\"ds-tag-dot\"></span>Skipped</span> <span class=\"ds-tag ds-tag-error\"><span class=\"ds-tag-dot\"></span>Failed</span>",
+      "css": ".ds-tag { display: inline-flex; align-items: center; gap: 6px; height: 20px; padding: 0 6px; border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums slashed-zero; } .ds-tag-dot { width: 6px; height: 6px; border-radius: 9999px; background: currentColor; } .ds-tag-success { background: var(--success-tag); color: var(--success-tag-foreground); } .ds-tag-warning { background: var(--warning-tag); color: var(--warning-tag-foreground); } .ds-tag-error { background: var(--error-tag); color: var(--error-tag-foreground); }"
+    },
+    {
+      "name": "Status Chip",
+      "kind": "chip",
+      "refersTo": "status-chip",
+      "description": "The response status code: neutral mono chip; the tone dot beside it carries the tone.",
+      "html": "<span class=\"ds-status\">200</span>",
+      "css": ".ds-status { display: inline-flex; align-items: center; height: 20px; padding: 0 6px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--background); color: var(--foreground); font-family: var(--font-mono); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums slashed-zero; }"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Apply, Import configuration, Reload Headering.",
+      "html": "<button class=\"ds-btn-primary\">Apply</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; height: 32px; padding: 0 10px; border: 1px solid transparent; border-radius: var(--radius-lg); background: var(--primary); color: var(--primary-foreground); font-family: var(--font-sans); font-size: 14px; font-weight: 500; cursor: pointer; } .ds-btn-primary:hover { background: color-mix(in srgb, var(--primary) 80%, transparent); } .ds-btn-primary:focus-visible { outline: none; border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 50%, transparent); } .ds-btn-primary:active { transform: translateY(1px); }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Options page actions (Import file, Export, Copy JSON, Discard).",
+      "html": "<button class=\"ds-btn-outline\">Export</button>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; height: 32px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--background); color: var(--foreground); font-family: var(--font-sans); font-size: 14px; font-weight: 500; cursor: pointer; } .ds-btn-outline:hover { background: var(--muted); } .ds-btn-outline:focus-visible { outline: none; border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 50%, transparent); } .ds-btn-outline:active { transform: translateY(1px); }"
+    },
+    {
+      "name": "Ghost Icon Button",
+      "kind": "nav",
+      "refersTo": "button-ghost-icon",
+      "description": "Popup header actions with Solar linear icons; the pressed pause button and the Paused tag are neutral, Slate Wash with Slate Ink.",
+      "html": "<span class=\"ds-paused-tag\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><path d=\"M2 18V6c0-1.9 0-2.8.6-3.4C3.2 2 4.1 2 6 2s2.8 0 3.4.6C10 3.2 10 4.1 10 6v12c0 1.9 0 2.8-.6 3.4-.6.6-1.5.6-3.4.6s-2.8 0-3.4-.6C2 20.8 2 19.9 2 18Zm12 0V6c0-1.9 0-2.8.6-3.4.6-.6 1.5-.6 3.4-.6s2.8 0 3.4.6c.6.6.6 1.5.6 3.4v12c0 1.9 0 2.8-.6 3.4-.6.6-1.5.6-3.4.6s-2.8 0-3.4-.6c-.6-.6-.6-1.5-.6-3.4Z\"/></svg>Paused</span> <button class=\"ds-btn-ghost\" aria-label=\"Settings\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M13.77 2.15C13.4 2 12.94 2 12 2s-1.4 0-1.77.15a2 2 0 0 0-1.08 1.08c-.09.23-.13.49-.14.87a1.62 1.62 0 0 1-.8 1.36 1.62 1.62 0 0 1-1.58 0c-.34-.18-.58-.27-.82-.3a2 2 0 0 0-1.47.4c-.32.24-.55.65-1.02 1.46-.47.81-.7 1.22-.75 1.61a2 2 0 0 0 .39 1.48c.15.19.36.36.68.56.48.3.79.8.79 1.36s-.31 1.06-.79 1.36c-.32.2-.53.37-.68.56a2 2 0 0 0-.39 1.48c.05.4.28.8.75 1.61.47.81.7 1.22 1.02 1.46a2 2 0 0 0 1.47.4c.24-.03.48-.12.82-.3a1.62 1.62 0 0 1 1.58 0c.49.28.78.8.8 1.36.01.38.05.64.14.87a2 2 0 0 0 1.08 1.08c.37.15.83.15 1.77.15s1.4 0 1.77-.15a2 2 0 0 0 1.08-1.08c.09-.23.13-.49.14-.87.02-.56.31-1.08.8-1.36a1.62 1.62 0 0 1 1.58 0c.34.18.58.27.82.3a2 2 0 0 0 1.47-.4c.32-.24.55-.65 1.02-1.46.47-.81.7-1.22.75-1.61a2 2 0 0 0-.39-1.48c-.15-.19-.36-.36-.68-.56-.48-.3-.79-.8-.79-1.36s.31-1.06.79-1.36c.32-.2.53-.37.68-.56a2 2 0 0 0 .39-1.48c-.05-.4-.28-.8-.75-1.61-.47-.81-.7-1.22-1.02-1.46a2 2 0 0 0-1.47-.4c-.24.03-.48.12-.82.3a1.62 1.62 0 0 1-1.58 0 1.62 1.62 0 0 1-.8-1.36c-.01-.38-.05-.64-.14-.87a2 2 0 0 0-1.08-1.08Z\"/></svg></button><button class=\"ds-btn-ghost ds-pressed\" aria-pressed=\"true\" aria-label=\"Resume\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><path d=\"M20.41 10.24a2 2 0 0 1 0 3.52L7.6 20.72A2 2 0 0 1 4.6 19V5a2 2 0 0 1 3-1.72Z\"/></svg></button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid transparent; border-radius: var(--radius-lg); background: transparent; color: var(--muted-foreground); cursor: pointer; } .ds-btn-ghost:hover { background: var(--muted); color: var(--foreground); } .ds-btn-ghost:focus-visible { outline: none; border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 50%, transparent); } .ds-btn-ghost.ds-pressed { background: var(--muted); color: var(--foreground); } .ds-paused-tag { display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 6px; border-radius: var(--radius-md); background: var(--muted); color: var(--foreground); font-family: var(--font-sans); font-size: 12px; font-weight: 500; }"
+    },
+    {
+      "name": "Preset Picker",
+      "kind": "input",
+      "refersTo": "header-line-sending",
+      "description": "A preset's header name in mono beside an outline trigger; purple name and value and a 50% purple border while sending.",
+      "html": "<div class=\"ds-preset\"><code>+ x-forwarded-for</code><button class=\"ds-preset-trigger\"><span>BR <span class=\"ds-preset-value\">1.178.47.255</span></span><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><path d=\"m19 9-7 6-7-6\"/></svg></button></div>",
+      "css": ".ds-preset { display: flex; align-items: center; gap: 8px; width: 304px; } .ds-preset code { flex-shrink: 0; font-family: var(--font-mono); font-size: 12px; color: var(--sending); transition: color 90ms steps(2); } .ds-preset-trigger { display: flex; flex: 1; min-width: 0; align-items: center; justify-content: space-between; height: 28px; padding: 0 8px; border: 1px solid color-mix(in srgb, var(--sending) 50%, transparent); border-radius: var(--radius-lg); background: var(--background); color: var(--foreground); font-family: var(--font-sans); font-size: 13px; cursor: pointer; transition: border-color 90ms steps(2), background-color 90ms steps(2); } .ds-preset-trigger:hover { background: var(--muted); } .ds-preset-trigger:focus-visible { outline: none; border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 50%, transparent); } .ds-preset-trigger svg { color: var(--muted-foreground); } .ds-preset-value { font-family: var(--font-mono); font-size: 12px; color: var(--sending); transition: color 90ms steps(2); }"
+    },
+    {
+      "name": "JSON Editor",
+      "kind": "input",
+      "refersTo": "json-editor",
+      "description": "Mono editor with a line-number gutter; the invalid line is marked in error tag colours.",
+      "html": "<div class=\"ds-editor\"><div class=\"ds-editor-gutter\"><div>1</div><div class=\"ds-invalid\">2</div><div>3</div></div><textarea class=\"ds-editor-text\" spellcheck=\"false\">{\n  \"profiles\": [,\n}</textarea></div>",
+      "css": ".ds-editor { display: flex; height: 120px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card); } .ds-editor:focus-within { border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 30%, transparent); } .ds-editor-gutter { width: 48px; flex-shrink: 0; padding: 16px 0; border-right: 1px solid var(--border); background: color-mix(in srgb, var(--muted) 40%, transparent); font-family: var(--font-mono); font-size: 12px; line-height: 20px; color: var(--muted-foreground); text-align: right; } .ds-editor-gutter div { padding-right: 12px; } .ds-editor-gutter .ds-invalid { background: var(--error-tag); color: var(--error-tag-foreground); font-weight: 600; } .ds-editor-text { flex: 1; border: 0; padding: 16px 16px 16px 12px; background: transparent; color: var(--foreground); font-family: var(--font-mono); font-size: 12px; line-height: 20px; resize: none; outline: none; caret-color: var(--primary); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Readout First",
+    "overview": "Headering opens on the answer. The first thing under the popup's header is a readout of the page's last document request: a tone dot, the status code, the host, and the headers worth watching, each with its value. Directly below it, with no heading between them, come the profiles that shape the next request. The popup reads top to bottom as \"this is what came back; this is what you're sending.\"\n\nThe system follows the push-based design guide's tokens: slate neutrals, a single purple, success / warning / error scales, Geist and Geist Mono, a fixed radius scale, and Solar icons. Tailwind's default palette is cleared, so only those scales exist. Headering wears its own identity in the guide's purple (the banded request/response mark in `assets/icon.svg`), not a push-based logo. It is an Operate surface: dense, quiet, scannable in seconds, with every switch on the right edge. Light and dark follow the OS and are both first-class.\n\nColour carries meaning, never decoration. Purple means sending; tones mean what the response said; slate is everything else. Sending colours don't fade between states, they step: colour switches in two frames over 90ms, like a signal changing.",
+    "keyCharacteristics": [
+      "The response readout leads the popup in a Paper White band; the profiles follow directly on the cooler slate ground.",
+      "Purple on header lines and the preset border means \"Headering is sending this right now\".",
+      "Paused leaves no sending purple and adds no tone: the neutral Paused tag appears in the header, checked switches go Slate Held, and header lines go Slate Quiet.",
+      "Tones (success, warning, error) only for inspected response values, the worst-tone dot and status.",
+      "Geist for names and UI text; Geist Mono with tabular, slashed-zero numerals for every header name, value and JSON.",
+      "Flat, hairline-divided rows instead of cards; 90ms `steps(2)` on every sending colour change in a profile row."
+    ],
+    "rules": [
+      {
+        "name": "The Sending Rule",
+        "body": "Purple on a header means exactly one thing: Headering is sending it right now. A header line, a preset name, value or border, or a checked switch is purple only if its header leaves the browser on the next request. Off is slate; held is slate. Primary buttons, the caret and focus rings are the only other purple, as interactive accents.",
+        "section": "colors"
+      },
+      {
+        "name": "The Response-Owns-Tone Rule",
+        "body": "Green, amber and red are reserved for what came back (inspected values, the worst-tone dot) and for status: whether the config is valid and whether clearing site data worked. Paused is not a tone; it is neutral. Never for decoration, never for a profile, never for a button.",
+        "section": "colors"
+      },
+      {
+        "name": "The Text-Carries-Tone Rule",
+        "body": "Every tone tag carries its value as text and a 6px current-colour dot; the response band's tone dot sits beside the status code and has a screen-reader label. Colour is never the only signal.",
+        "section": "colors"
+      },
+      {
+        "name": "The Mono-Is-Data Rule",
+        "body": "Anything a server would read (header names, values, status codes, paths, JSON, cookie names) is set in Geist Mono with tabular numerals. Anything a person named (profiles, groups, presets, hosts) is set in Geist.",
+        "section": "typography"
+      },
+      {
+        "name": "The Quiet Prefix Rule",
+        "body": "When every inspected header shares a dash-terminated prefix, the prefix is Slate Quiet and the distinguishing tail is full ink.",
+        "section": "typography"
+      },
+      {
+        "name": "The Band-Not-Card Rule",
+        "body": "Group content into full-width bands and rows divided by hairlines. Profiles never sit in individual bordered cards; the only bordered block in the list is a mutually exclusive group, and its rows share it.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** keep the response band first, directly under the header, and the profile list straight below it with no heading.",
+      "**Do** add popup content as full-width rows: 16px sides, 8px top and bottom; inside a group block, 7px sides with a hairline rule above each row, so text and switches keep the ungrouped column and edge.",
+      "**Do** colour anything that leaves the browser Sending Purple while it is sending, and slate the moment it isn't.",
+      "**Do** use Solar linear icons only (`~icons/solar/*-linear`), at 12px inline and in 20px tags, 16px in buttons and 24px tags, 20px for the header mark.",
+      "**Do** set header names, values, status codes and JSON in Geist Mono with tabular, slashed-zero numerals.",
+      "**Do** use Geist Mono 14/20 semibold for section titles on the options page.",
+      "**Do** step sending colour changes in profile rows over 90ms with `steps(2)`.",
+      "**Do** swap to the 400 shades of purple and tones on dark grounds, with 14–18% washes for tag fills.",
+      "**Do** pair every tone with its text value."
+    ],
+    "donts": [
+      "**Don't** wrap profiles in individual cards or stack identical toggle cards; only a mutually exclusive group gets a bordered block.",
+      "**Don't** use purple for anything that isn't being sent right now, beyond primary buttons, focus and the caret.",
+      "**Don't** leave any sending purple while paused; the Paused tag shows it, checked switches go Slate Held and header lines go Slate Quiet.",
+      "**Don't** use success, warning or error colours outside response values and status; paused is neutral, never amber.",
+      "**Don't** mix icon sets or add Lucide icons.",
+      "**Don't** add colours outside the guide's scales; Tailwind's default palette is intentionally cleared.",
+      "**Don't** put a push-based logo in the UI; Headering uses its own mark.",
+      "**Don't** ease or fade state colours over long durations; a header line switches, it doesn't glow."
+    ]
+  }
+}

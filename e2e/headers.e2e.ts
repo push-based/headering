@@ -155,7 +155,7 @@ test('shows the configured headers of the page\'s document request', async ({ co
       ],
       tabId,
     );
-  await expect.poll(badge).toEqual(['⚠\uFE0E', [250, 204, 21, 255], [66, 32, 6, 255]]);
+  await expect.poll(badge).toEqual(['⚠\uFE0E', [251, 191, 36, 255], [69, 26, 3, 255]]);
 
   const popup = await context.newPage();
   await popup.goto(extensionUrl(`popup.html?tabId=${tabId}`));
@@ -183,7 +183,7 @@ test('shows the configured headers of the page\'s document request', async ({ co
   await site.reload();
   await expect(value('x-ssr-request-id')).not.toHaveText(before ?? '');
   await expect(value('x-ssr-request-id')).toHaveText(/^req-\d+$/);
-  await expect.poll(badge).toEqual(['⚠\uFE0E', [250, 204, 21, 255], [66, 32, 6, 255]]);
+  await expect.poll(badge).toEqual(['⚠\uFE0E', [251, 191, 36, 255], [69, 26, 3, 255]]);
 });
 
 test('says headers come with the next load when the page was loaded before the extension', async ({ context, extensionUrl }) => {

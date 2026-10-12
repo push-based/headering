@@ -1,9 +1,10 @@
 import type { KeyboardEvent } from 'react';
-import { ChevronsUpDown } from 'lucide-react';
+import ChevronDown from '~icons/solar/alt-arrow-down-linear';
 import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import type { Header } from '@/lib/config';
+import { cn } from '@/lib/utils';
 
 /** Ranks label prefix matches first (so "at" → AT), then label and value substrings. */
 function matchOption(label: string, search: string, keywords: string[] = []): number {
@@ -15,7 +16,16 @@ function matchOption(label: string, search: string, keywords: string[] = []): nu
   return 0;
 }
 
-export function OptionPicker({ header, onChange }: { header: Header; onChange: (value: string) => void }) {
+export function OptionPicker({
+  header,
+  sending,
+  onChange,
+}: {
+  header: Header;
+  /** Whether Headering is sending this header right now, which the picker shows in the sending colour. */
+  sending: boolean;
+  onChange: (value: string) => void;
+}) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -43,7 +53,7 @@ export function OptionPicker({ header, onChange }: { header: Header; onChange: (
 
   return (
     <div className="flex w-full items-center gap-2">
-      <code className="shrink-0 font-mono text-xs text-muted-foreground">{header.name}</code>
+      <code className={cn('shrink-0 font-mono text-xs transition-colors duration-[90ms] ease-[steps(2)]', sending ? 'text-sending' : 'text-muted-foreground')}>+ {header.name}</code>
       <Popover open={open} onOpenChange={setOpenState}>
         <PopoverTrigger asChild>
           <Button
@@ -54,14 +64,14 @@ export function OptionPicker({ header, onChange }: { header: Header; onChange: (
             role="combobox"
             aria-expanded={open}
             aria-label={header.name}
-            className="min-w-0 flex-1 justify-between font-normal"
+            className={cn('h-7 min-w-0 flex-1 justify-between px-2 font-normal transition-colors duration-[90ms] ease-[steps(2)]', sending && 'border-sending/50 dark:border-sending/50')}
             onKeyDown={onTriggerKeyDown}
           >
             <span className="flex min-w-0 items-baseline gap-1.5 truncate">
               {selected?.label}
-              <span className="font-mono text-xs text-muted-foreground">{selected?.value}</span>
+              <span className={cn('font-mono text-xs transition-colors duration-[90ms] ease-[steps(2)]', sending ? 'text-sending' : 'text-muted-foreground')}>{selected?.value}</span>
             </span>
-            <ChevronsUpDown className="text-muted-foreground" />
+            <ChevronDown className="text-muted-foreground" />
           </Button>
         </PopoverTrigger>
         <PopoverContent

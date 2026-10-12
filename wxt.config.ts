@@ -1,4 +1,5 @@
 import tailwindcss from '@tailwindcss/vite';
+import Icons from 'unplugin-icons/vite';
 import { defineConfig } from 'wxt';
 
 // See https://wxt.dev/api/config.html
@@ -9,7 +10,8 @@ export default defineConfig({
     baseIconPath: 'assets/icon.svg',
   },
   vite: () => ({
-    plugins: [tailwindcss()],
+    // Solar icons from the push-based design guide, compiled into the bundle (`~icons/solar/<name>`).
+    plugins: [tailwindcss(), Icons({ compiler: 'jsx', jsx: 'react' })],
   }),
   manifest: {
     name: 'Headering',

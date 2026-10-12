@@ -258,3 +258,14 @@ function inspectHeaderToJson(header: InspectHeader) {
     }),
   };
 }
+
+/** The line a JSON syntax error points at, from V8's "(line 3 column 5)" or "at position 45". */
+export function errorLine(errors: string[], text: string): number | undefined {
+  for (const error of errors) {
+    const line = error.match(/\(line (\d+) column \d+\)/);
+    if (line) return Number(line[1]);
+    const position = error.match(/at position (\d+)/);
+    if (position) return text.slice(0, Number(position[1])).split('\n').length;
+  }
+  return undefined;
+}

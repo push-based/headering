@@ -1,16 +1,18 @@
 import type { ChangeEvent, DragEvent } from 'react';
-import { Check, CircleAlert, Copy, Download, Upload } from 'lucide-react';
+import CheckCircle from '~icons/solar/check-circle-linear';
+import CopyIcon from '~icons/solar/copy-linear';
+import Danger from '~icons/solar/danger-circle-linear';
+import ExportIcon from '~icons/solar/export-linear';
+import ImportIcon from '~icons/solar/import-linear';
 import icon from '@/assets/icon.svg';
 import { Popup } from '@/components/popup/Popup';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import { parseConfig, serializeConfig, type Config, type InspectHeader } from '@/lib/config';
+import { errorLine, parseConfig, serializeConfig, type Config, type InspectHeader } from '@/lib/config';
 import type { DocumentRequest } from '@/lib/document';
 import { configItem, pausedItem } from '@/lib/settings';
 import { cn } from '@/lib/utils';
+import { JsonEditor } from './JsonEditor';
 
 function App() {
   const [saved, setSaved] = useState<Config | null>(null);
@@ -90,96 +92,97 @@ function App() {
 
   return (
     <div className="flex min-h-svh flex-col">
-      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-8">
-        <header className="flex flex-wrap items-end justify-between gap-4">
+      <header className="border-b bg-card">
+        <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
           <div className="flex items-center gap-3">
-            <img src={icon} alt="" className="size-10" />
+            <img src={icon} alt="" className="size-8" />
             <div>
-              <h1 className="font-heading text-2xl font-semibold tracking-tight">Headering</h1>
-              <p className="text-muted-foreground">Import, edit and share header profiles as JSON.</p>
+              <h1 className="text-lg leading-7 font-semibold">Headering</h1>
+              <p className="text-sm text-muted-foreground">Import, edit and share header profiles as JSON.</p>
             </div>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => fileInput.current?.click()}>
-              <Upload /> Import file
+              <ImportIcon /> Import file
             </Button>
             <Button variant="outline" onClick={exportFile}>
-              <Download /> Export
+              <ExportIcon /> Export
             </Button>
             <Button variant="outline" onClick={copy}>
-              <Copy /> Copy
+              <CopyIcon /> Copy JSON
             </Button>
             <input ref={fileInput} type="file" accept=".json,application/json" hidden onChange={onFileChange} />
           </div>
-        </header>
-
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Configuration</CardTitle>
-              <CardDescription>Paste, edit, or drop a .json file below.</CardDescription>
-              <CardAction>
-                {result.ok ? (
-                  <Badge variant="secondary">
-                    <Check /> Valid
-                  </Badge>
-                ) : (
-                  <Badge variant="destructive">
-                    <CircleAlert /> {result.errors.length} {result.errors.length === 1 ? 'error' : 'errors'}
-                  </Badge>
-                )}
-              </CardAction>
-            </CardHeader>
-            <CardContent>
-              <Textarea
-                spellCheck={false}
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setDragging(true);
-                }}
-                onDragLeave={() => setDragging(false)}
-                onDrop={onDrop}
-                aria-label="Configuration JSON"
-                aria-invalid={!result.ok}
-                className={cn(
-                  'field-sizing-fixed h-[560px] resize-y font-mono text-xs leading-relaxed md:text-xs',
-                  dragging && 'border-primary ring-3 ring-primary/30',
-                )}
-              />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Preview</CardTitle>
-              <CardDescription>How the popup will look once applied.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {result.ok ? (
-                <Preview config={result.config} paused={paused} />
-              ) : (
-                <Alert variant="destructive">
-                  <CircleAlert />
-                  <AlertTitle>This configuration can't be applied</AlertTitle>
-                  <AlertDescription>
-                    <ul className="list-disc space-y-1 pl-4 font-mono text-xs">
-                      {result.errors.map((error) => (
-                        <li key={error}>{error}</li>
-                      ))}
-                    </ul>
-                  </AlertDescription>
-                </Alert>
-              )}
-            </CardContent>
-          </Card>
         </div>
+      </header>
+
+      <main className="mx-auto grid w-full max-w-7xl flex-1 grid-cols-[minmax(0,1fr)] gap-8 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(0,1fr)_362px]">
+        <section aria-labelledby="config-title" className="flex min-w-0 flex-col gap-3">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h2 id="config-title" className="font-mono text-sm font-semibold">
+                Configuration
+              </h2>
+              <p className="text-sm text-muted-foreground">Paste, edit, or drop a .json file below.</p>
+            </div>
+            {result.ok ? (
+              <span className="inline-flex h-6 items-center gap-1.5 rounded-md bg-success-tag px-2 text-xs font-medium text-success-tag-foreground">
+                <CheckCircle className="size-4" /> Valid
+              </span>
+            ) : (
+              <span className="inline-flex h-6 items-center gap-1.5 rounded-md bg-error-tag px-2 text-xs font-medium text-error-tag-foreground">
+                <Danger className="size-4" /> {result.errors.length} {result.errors.length === 1 ? 'error' : 'errors'}
+              </span>
+            )}
+          </div>
+          <JsonEditor
+            value={text}
+            onChange={(e) => {
+              setText(e.target.value);
+              // A note like "Configuration applied." no longer describes an edited draft.
+              setStatus('');
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragging(true);
+            }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={onDrop}
+            aria-label="Configuration JSON"
+            aria-invalid={!result.ok}
+            invalidLine={result.ok ? undefined : errorLine(result.errors, text)}
+            dragging={dragging}
+          />
+        </section>
+
+        <section aria-labelledby="preview-title" className="flex min-w-0 flex-col gap-3">
+          <div>
+            <h2 id="preview-title" className="font-mono text-sm font-semibold">
+              Preview
+            </h2>
+            <p className="text-sm text-muted-foreground">How the popup will look once applied.</p>
+          </div>
+          {result.ok ? (
+            <Preview config={result.config} paused={paused} />
+          ) : (
+            <Alert variant="destructive">
+              <Danger />
+              <AlertTitle>This configuration can't be applied</AlertTitle>
+              <AlertDescription>
+                <ul className="list-disc space-y-1 pl-4 font-mono text-xs">
+                  {result.errors.map((error) => (
+                    <li key={error}>{error}</li>
+                  ))}
+                </ul>
+              </AlertDescription>
+            </Alert>
+          )}
+        </section>
       </main>
 
-      <footer className="sticky bottom-0 border-t bg-background/80 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl items-center gap-2 px-4 py-3">
-          <span role="status" className="mr-auto text-sm text-muted-foreground">
+      <footer className="sticky bottom-0 border-t bg-card">
+        <div className="mx-auto flex w-full max-w-7xl items-center gap-2 px-4 py-3 sm:px-6">
+          <span role="status" className={cn('mr-auto text-sm', changed && !status ? 'text-foreground' : 'text-muted-foreground')}>
             {status || (changed ? 'You have unsaved changes.' : 'Up to date.')}
           </span>
           <Button variant="outline" disabled={!changed} onClick={discard}>
@@ -200,7 +203,8 @@ function Preview({ config, paused }: { config: Config; paused: boolean }) {
   const noop = () => {};
 
   return (
-    <div inert className="mx-auto w-fit overflow-hidden rounded-xl border bg-background shadow-sm">
+    // Narrower than the popup, the preview scrolls sideways rather than squeezing it.
+    <div inert className="max-w-full overflow-x-auto rounded-xl border bg-background shadow-[0_4px_16px_-4px_rgb(13_18_28/0.12)] lg:w-fit">
       <Popup
         config={config}
         paused={paused}
@@ -211,6 +215,7 @@ function Preview({ config, paused }: { config: Config; paused: boolean }) {
         // So the clear buttons the config turns on show too.
         siteOrigin={new URL(request.url).origin}
         onClearSiteData={async () => ({})}
+        sample
       />
     </div>
   );

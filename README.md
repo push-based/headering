@@ -12,7 +12,7 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/images/popup-dark.png">
-  <img src="docs/images/popup-light.png" alt="The Headering popup showing the current page's response headers as coloured tags, followed by header profiles with on/off switches, a group of mutually exclusive profiles, and a dropdown of preset values." width="360">
+  <img src="docs/images/popup-light.png" alt="The Headering popup: the current page's status and response headers as coloured tags at the top, then the outgoing header profiles with on/off switches, a group of mutually exclusive profiles, and a dropdown of preset values." width="360">
 </picture>
 
 </div>
@@ -54,7 +54,7 @@ Then open `chrome://extensions`, turn on **Developer mode**, click **Load unpack
 
    <picture>
      <source media="(prefers-color-scheme: dark)" srcset="docs/images/options-dark.png">
-     <img src="docs/images/options-light.png" alt="The options page with the JSON config in an editor on the left and a live preview of the popup on the right." width="800">
+     <img src="docs/images/options-light.png" alt="The options page with the JSON config in a line-numbered editor on the left and a live preview of the popup on the right." width="800">
    </picture>
 
 4. Open the popup from the toolbar to switch profiles on and off.
@@ -192,7 +192,7 @@ pnpm zip        # package for the Chrome Web Store
 
 Commit messages are checked by [commitlint](https://commitlint.js.org) and the code by oxlint, through Git hooks that `pnpm install` sets up. CI runs the linter, type-check, unit tests and e2e tests on every push and pull request.
 
-The extension is built with [WXT](https://wxt.dev), React, TypeScript, Tailwind CSS and [shadcn/ui](https://ui.shadcn.com).
+The extension is built with [WXT](https://wxt.dev), React, TypeScript, Tailwind CSS and [shadcn/ui](https://ui.shadcn.com), with [Solar](https://icon-sets.iconify.design/solar/) icons compiled in by [unplugin-icons](https://github.com/unplugin/unplugin-icons). [DESIGN.md](DESIGN.md) describes the visual system.
 
 ### Project layout
 
@@ -206,8 +206,8 @@ The extension is built with [WXT](https://wxt.dev), React, TypeScript, Tailwind 
 | `lib/document.ts` | Captured document requests, stored per tab in `chrome.storage.session`, and header lookup. |
 | `lib/site.ts` | Clearing a site's data. |
 | `lib/settings.ts` | Typed `chrome.storage` items for the config and the paused state. |
-| `components/ui/` | shadcn/ui components. Add more with `pnpm dlx shadcn@latest add <name>`. |
-| `assets/tailwind.css` | Tailwind and the shadcn theme. Dark mode follows the OS. |
+| `components/ui/` | shadcn/ui components. Add more with `pnpm dlx shadcn@latest add <name>`, then swap any Lucide icons for Solar ones (`~icons/solar/<name>`). |
+| `assets/tailwind.css` | The design tokens and the shadcn theme built on them. Dark mode follows the OS. |
 | `examples/` | Example configs. |
 | `docs/images/` | Screenshots used in this README. |
 | `e2e/` | Playwright tests against the built extension. |
